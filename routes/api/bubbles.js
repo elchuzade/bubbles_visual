@@ -162,6 +162,41 @@ router.put(
   }
 );
 
+// @route PUT api/bubbles/:id/deadline
+// @desc Change bubble deadline
+router.put(
+  '/:id/deadline',
+  passport.authenticate('jwt', { session: false }),
+  (req, res) => {
+    const { errors, isValid } = validateDeadline(req.body);
+    if (!isValid) return res.status(400).json(errors);
+
+    Bubble.findById(req.params.id)
+      .then(bubble => {
+        if (req.body.deadline) bubble.deadline = req.body.deadline;
+        bubble
+          .save()
+          .then(bubble =>
+            res.status(201).json({
+              item: bubble,
+              action: 'update',
+              message: 'Updated bubble'
+            })
+          )
+          .catch(err => {
+            errors.bubble = 'Bubble can not be saved';
+            console.log(err);
+            return res.status(400).json(errors);
+          });
+      })
+      .catch(err => {
+        errors.bubble = 'Bubble not found';
+        console.log(err);
+        return res.status(404).json(errors);
+      });
+  }
+);
+
 // @route GET api/bubbles/:id/
 // @desc Get full bubble info
 router.get(
