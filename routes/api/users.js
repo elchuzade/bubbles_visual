@@ -9,6 +9,7 @@ const validateRegisterInput = require('../../validation/register');
 const validateLoginInput = require('../../validation/login');
 
 const User = require('../../models/User');
+const Bubble = require('../../models/Bubble');
 
 // @route POST api/users/register
 // @desc Register user
@@ -36,7 +37,23 @@ router.post('/register', (req, res) => {
           newUser.password = hash;
           newUser
             .save()
-            .then(user => res.json(user))
+            .then(user => {
+              let bubble = {
+                title: user.name,
+                importance: 100,
+                status: "main"
+              };
+              new Bubble(bubble)
+                .save()
+                .then(bubble => {
+                  return res.status(201).json(user);
+                })
+                .catch(err => {
+                  errors.bubble = 'Bubble can not be saved';
+                  console.log(err);
+                  return res.status(400).json(errors);
+                });
+            })
             .catch(err => console.log(err));
         });
       });
