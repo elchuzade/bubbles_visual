@@ -28,7 +28,6 @@ router.post(
   passport.authenticate('jwt', { session: false }),
   (req, res) => {
     const { errors, isValid } = validatePath(req.body);
-    console.log(req.body.bubblePath);
 
     // if (!isValid) return res.status(400).json(errors);
 
@@ -40,13 +39,13 @@ router.post(
     };
     new Bubble(bubble)
       .save()
-      .then(bubble => {
-        return res.status(201).json({
+      .then(bubble =>
+        res.status(201).json({
           item: bubble,
           action: 'add',
           message: 'Added bubble'
-        });
-      })
+        })
+      )
       .catch(err => {
         errors.bubble = 'Bubble can not be saved';
         console.log(err);
@@ -72,13 +71,13 @@ router.put(
         if (req.body.info) bubble.info = req.body.info;
         bubble
           .save()
-          .then(bubble => {
-            return res.status(201).json({
+          .then(bubble =>
+            res.status(201).json({
               item: bubble,
               action: 'update',
               message: 'Updated bubble'
-            });
-          })
+            })
+          )
           .catch(err => {
             errors.bubble = 'Bubble can not be saved';
             console.log(err);
@@ -88,7 +87,59 @@ router.put(
       .catch(err => {
         errors.bubble = 'Bubble not found';
         console.log(err);
-        res.status(404).json(errors);
+        return res.status(404).json(errors);
+      });
+  }
+);
+
+// @route PUT api/bubbles/:id/status
+// @desc Change bubble status
+router.put(
+  '/:id/status',
+  passport.authenticate('jwt', { session: false }),
+  (req, res) => {
+    const { errors, isValid } = validateStatus(req.body);
+    if (!isValid) return res.status(400).json(errors);
+
+    Bubble.findById(req.params.id)
+      .then(bubble => {
+        if (req.body.status) bubble.status = req.body.status;
+        bubble
+          .save()
+          .then(bubble =>
+            res.status(201).json({
+              item: bubble,
+              action: 'update',
+              message: 'Updated bubble'
+            })
+          )
+          .catch(err => {
+            errors.bubble = 'Bubble can not be saved';
+            console.log(err);
+            return res.status(400).json(errors);
+          });
+      })
+      .catch(err => {
+        errors.bubble = 'Bubble not found';
+        console.log(err);
+        return res.status(404).json(errors);
+      });
+  }
+);
+
+// @route GET api/bubbles/:id/
+// @desc Get full bubble info
+router.get(
+  '/',
+  passport.authenticate('jwt', { session: false }),
+  (req, res) => {
+    const errors = {};
+    Bubble.findById(req.params.id)
+      .then(bubble => res.status(200).json(bubble))
+      .catch(err => {
+        errors.bubble = 'Bubble not found';
+        console.log(err);
+        return res.status(404).json(errors);
       });
   }
 );
