@@ -127,10 +127,45 @@ router.put(
   }
 );
 
+// @route PUT api/bubbles/:id/importance
+// @desc Change bubble importance
+router.put(
+  '/:id/importance',
+  passport.authenticate('jwt', { session: false }),
+  (req, res) => {
+    const { errors, isValid } = validateImportance(req.body);
+    if (!isValid) return res.status(400).json(errors);
+
+    Bubble.findById(req.params.id)
+      .then(bubble => {
+        if (req.body.importance) bubble.importance = req.body.importance;
+        bubble
+          .save()
+          .then(bubble =>
+            res.status(201).json({
+              item: bubble,
+              action: 'update',
+              message: 'Updated bubble'
+            })
+          )
+          .catch(err => {
+            errors.bubble = 'Bubble can not be saved';
+            console.log(err);
+            return res.status(400).json(errors);
+          });
+      })
+      .catch(err => {
+        errors.bubble = 'Bubble not found';
+        console.log(err);
+        return res.status(404).json(errors);
+      });
+  }
+);
+
 // @route GET api/bubbles/:id/
 // @desc Get full bubble info
 router.get(
-  '/',
+  '/:id',
   passport.authenticate('jwt', { session: false }),
   (req, res) => {
     const errors = {};
