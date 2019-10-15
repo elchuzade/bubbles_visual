@@ -28,9 +28,7 @@ router.post(
   passport.authenticate('jwt', { session: false }),
   (req, res) => {
     const { errors, isValid } = validatePath(req.body);
-
     // if (!isValid) return res.status(400).json(errors);
-
     // Input Validation passed successfully, create a new bubble
     let bubble = {
       title: 'title'
@@ -100,7 +98,6 @@ router.put(
   (req, res) => {
     const { errors, isValid } = validateStatus(req.body);
     if (!isValid) return res.status(400).json(errors);
-
     Bubble.findById(req.params.id)
       .then(bubble => {
         if (req.body.status) bubble.status = req.body.status;
@@ -135,7 +132,6 @@ router.put(
   (req, res) => {
     const { errors, isValid } = validateImportance(req.body);
     if (!isValid) return res.status(400).json(errors);
-
     Bubble.findById(req.params.id)
       .then(bubble => {
         if (req.body.importance) bubble.importance = req.body.importance;
@@ -170,10 +166,42 @@ router.put(
   (req, res) => {
     const { errors, isValid } = validateDeadline(req.body);
     if (!isValid) return res.status(400).json(errors);
-
     Bubble.findById(req.params.id)
       .then(bubble => {
         if (req.body.deadline) bubble.deadline = req.body.deadline;
+        bubble
+          .save()
+          .then(bubble =>
+            res.status(201).json({
+              item: bubble,
+              action: 'update',
+              message: 'Updated bubble'
+            })
+          )
+          .catch(err => {
+            errors.bubble = 'Bubble can not be saved';
+            console.log(err);
+            return res.status(400).json(errors);
+          });
+      })
+      .catch(err => {
+        errors.bubble = 'Bubble not found';
+        console.log(err);
+        return res.status(404).json(errors);
+      });
+  }
+);
+
+// @route Delete api/bubbles/:id/deadline
+// @desc Delete bubble deadline
+router.delete(
+  '/:id/deadline',
+  passport.authenticate('jwt', { session: false }),
+  (req, res) => {
+    const errors = {};
+    Bubble.findById(req.params.id)
+      .then(bubble => {
+        bubble.deadline = null;
         bubble
           .save()
           .then(bubble =>
