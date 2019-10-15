@@ -62,7 +62,7 @@ const BubbleSchema = new Schema(
         }
       }
     ],
-    path: [
+    bubblePath: [
       {
         id: {
           type: String

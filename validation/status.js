@@ -1,13 +1,13 @@
 const Validator = require('validator');
 const isEmpty = require('./is-empty');
-const statusList = require('./');
+const statusList = require('../common/statusList');
 
 module.exports = function validateStatus(data) {
   let errors = {};
 
   data.status = !isEmpty(data.status) ? data.status : '';
 
-  if (data.status ) {
+  if (statusList.indexOf(data.status) == -1) {
     errors.status = 'Status is invalid';
   }
   if (Validator.isEmpty(data.status)) {
