@@ -7,9 +7,9 @@ const validateStatus = require('../../validation/status');
 const validateImportance = require('../../validation/importance');
 const validatePath = require('../../validation/path');
 const validateAccess = require('../../validation/access');
-const validateParentPage = require('../../validation/parent-page');
+const validateParent = require('../../validation/parent');
+const validatePage = require('../../validation/page');
 const validatePosition = require('../../validation/position');
-
 
 // AWS IMAGES
 const aws = require('aws-sdk');
@@ -31,9 +31,9 @@ router.post(
   '/',
   passport.authenticate('jwt', { session: false }),
   (req, res) => {
-    const { errors, isValid } = validateParentPage(req.body.parent, "parent");
+    const { errors, isValid } = validateParent(req.body.parent);
     if (!isValid) return res.status(400).json(errors);
-    errors, isValid = validatePath(req.body);
+    errors, (isValid = validatePath(req.body));
     if (!isValid) return res.status(400).json(errors);
     // Input Validation passed successfully, create a new bubble
     let access = {
@@ -239,6 +239,23 @@ router.delete(
   }
 );
 
+// @route GET api/bubbles/:id/page
+// @desc Get all the bubbles that share the same page
+router.get(
+  '/:id/page',
+  passport.authenticate('jwt', { session: false }),
+  (req, res) => {
+    const errors = {};
+    Bubble.findById(req.params.id)
+      .then(bubble => res.status(200).json(bubble))
+      .catch(err => {
+        errors.bubble = 'Bubble not found';
+        console.log(err);
+        return res.status(404).json(errors);
+      });
+  }
+);
+
 // @route GET api/bubbles/:id/
 // @desc Get full bubble info
 router.get(
@@ -416,29 +433,36 @@ router.post(
   '/:id/page',
   passport.authenticate('jwt', { session: false }),
   (req, res) => {
-    const { errors, isValid } = validateParentPage(req.body.page, "page");
+    const { errors, isValid } = validatePage(req.body);
     if (!isValid) return res.status(400).json(errors);
-
-    Bubble.findById(req.params.id)
-      .then(bubble => {
-        if (req.body.page) bubble.page = req.body.page;
-        bubble
-          .save()
-          .then(bubble =>
-            res.status(201).json({
-              item: bubble,
-              action: 'update',
-              message: 'Updated bubble'
-            })
-          )
+    Bubble.findById(req.body.page)
+      .then(page => {
+        Bubble.findById(req.params.id)
+          .then(bubble => {
+            if (req.body.page) bubble.page = page._id;
+            bubble
+              .save()
+              .then(bubble =>
+                res.status(201).json({
+                  item: bubble,
+                  action: 'update',
+                  message: 'Updated bubble'
+                })
+              )
+              .catch(err => {
+                errors.bubble = 'Bubble can not be saved';
+                console.log(err);
+                return res.status(400).json(errors);
+              });
+          })
           .catch(err => {
-            errors.bubble = 'Bubble can not be saved';
+            errors.bubble = 'Bubble not found';
             console.log(err);
-            return res.status(400).json(errors);
+            return res.status(404).json(errors);
           });
       })
       .catch(err => {
-        errors.bubble = 'Bubble not found';
+        errors.page = 'Page not found';
         console.log(err);
         return res.status(404).json(errors);
       });
