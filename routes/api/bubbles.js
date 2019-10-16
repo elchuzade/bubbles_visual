@@ -7,7 +7,9 @@ const validateStatus = require('../../validation/status');
 const validateImportance = require('../../validation/importance');
 const validatePath = require('../../validation/path');
 const validateAccess = require('../../validation/access');
+const validateParentPage = require('../../validation/parent-page');
 const validatePosition = require('../../validation/position');
+
 
 // AWS IMAGES
 const aws = require('aws-sdk');
@@ -29,9 +31,9 @@ router.post(
   '/',
   passport.authenticate('jwt', { session: false }),
   (req, res) => {
-    const { errors, isValid } = validateBubble(req.body);
+    const { errors, isValid } = validateParentPage(req.body.parent, "parent");
     if (!isValid) return res.status(400).json(errors);
-    const { errors, isValid } = validatePath(req.body);
+    errors, isValid = validatePath(req.body);
     if (!isValid) return res.status(400).json(errors);
     // Input Validation passed successfully, create a new bubble
     let access = {
@@ -43,7 +45,7 @@ router.post(
       y: 25, // later should be some formula to find free spot
       title: 'title',
       access: access,
-      page = req.body.parent._id
+      page: req.body.parent._id
       // bubblePath: req.body.path,
       // parent: req.body.bubblePath[req.body.bubblePath.length - 1]
     };
@@ -408,18 +410,54 @@ router.post(
   }
 );
 
+// @route POST api/bubbles/:id/page
+// @desc Update bubble page
+router.post(
+  '/:id/page',
+  passport.authenticate('jwt', { session: false }),
+  (req, res) => {
+    const { errors, isValid } = validateParentPage(req.body.page, "page");
+    if (!isValid) return res.status(400).json(errors);
+
+    Bubble.findById(req.params.id)
+      .then(bubble => {
+        if (req.body.page) bubble.page = req.body.page;
+        bubble
+          .save()
+          .then(bubble =>
+            res.status(201).json({
+              item: bubble,
+              action: 'update',
+              message: 'Updated bubble'
+            })
+          )
+          .catch(err => {
+            errors.bubble = 'Bubble can not be saved';
+            console.log(err);
+            return res.status(400).json(errors);
+          });
+      })
+      .catch(err => {
+        errors.bubble = 'Bubble not found';
+        console.log(err);
+        return res.status(404).json(errors);
+      });
+  }
+);
+
 // @route POST api/bubbles/:id/position
 // @desc Update bubble position
 router.post(
   '/:id/position',
   passport.authenticate('jwt', { session: false }),
   (req, res) => {
-    const { errors, isValid } = validateAccess(req.body);
+    const { errors, isValid } = validatePosition(req.body);
     if (!isValid) return res.status(400).json(errors);
 
     Bubble.findById(req.params.id)
       .then(bubble => {
-        if (req.body.access) bubble.access = req.body.access;
+        if (req.body.position.x) bubble.position.x = req.body.position.x;
+        if (req.body.position.y) bubble.position.y = req.body.position.y;
         bubble
           .save()
           .then(bubble =>
