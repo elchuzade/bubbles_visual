@@ -246,8 +246,8 @@ router.get(
   passport.authenticate('jwt', { session: false }),
   (req, res) => {
     const errors = {};
-    Bubble.findById(req.params.id)
-      .then(bubble => res.status(200).json(bubble))
+    Bubble.find({ page: req.params.id })
+      .then(bubbles => res.status(200).json(bubbles))
       .catch(err => {
         errors.bubble = 'Bubble not found';
         console.log(err);
