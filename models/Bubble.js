@@ -7,6 +7,9 @@ const BubbleSchema = new Schema(
     user: {
       type: String
     },
+    page: {
+      type: String
+    },
     position: {
       x: {
         type: Number
@@ -78,6 +81,15 @@ const BubbleSchema = new Schema(
         },
         title: {
           type: String
+        },
+        importance: {
+          type: Number
+        },
+        x: {
+          type: Number
+        },
+        y: {
+          type: Number
         }
       }
     ],

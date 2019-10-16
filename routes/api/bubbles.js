@@ -29,18 +29,21 @@ router.post(
   '/',
   passport.authenticate('jwt', { session: false }),
   (req, res) => {
+    const { errors, isValid } = validateBubble(req.body);
+    if (!isValid) return res.status(400).json(errors);
     const { errors, isValid } = validatePath(req.body);
-    // if (!isValid) return res.status(400).json(errors);
+    if (!isValid) return res.status(400).json(errors);
     // Input Validation passed successfully, create a new bubble
     let access = {
       type: 'private'
     };
     let bubble = {
       user: req.user.id,
-      x: 25,
-      y: 25,
+      x: 25, // later should be some formula to find free spot
+      y: 25, // later should be some formula to find free spot
       title: 'title',
-      access: access
+      access: access,
+      page = req.body.parent._id
       // bubblePath: req.body.path,
       // parent: req.body.bubblePath[req.body.bubblePath.length - 1]
     };

@@ -41,11 +41,20 @@ router.post('/register', (req, res) => {
               let bubble = {
                 title: user.name,
                 importance: 100,
-                status: "main"
+                status: 'main'
               };
               new Bubble(bubble)
                 .save()
                 .then(bubble => {
+                  bubble.page = bubble._id;
+                  bubble
+                    .save()
+                    .then(bubble => res.status(201).json(user))
+                    .catch(err => {
+                      errors.bubble = 'Bubble can not be saved';
+                      console.log(err);
+                      return res.status(400).json(errors);
+                    });
                   return res.status(201).json(user);
                 })
                 .catch(err => {
