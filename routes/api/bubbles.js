@@ -301,4 +301,47 @@ router.post(
   }
 );
 
+// @route DELETE api/bubbles/:id/avatar
+// @desc Delete bubble avatar
+router.delete(
+  '/:id/avatar',
+  passport.authenticate('jwt', { session: false }),
+  (req, res) => {
+    const errors = {};
+    Bubble.findById(req.params.id)
+      .then(bubble => {
+        let params = {};
+        if (bubble.avatar && bubble.avatar.key) {
+          params = {
+            Bucket: bubble.avatar.bucket,
+            Delete: {
+              Objects: [{ Key: bubble.avatar.key }]
+            }
+          };
+        }
+        if (params.Delete && params.Delete.Objects.length > 0) {
+          s3.deleteObjects(params, (err, data) => {
+            if (err) console.log(err);
+            else {
+              bubble.avatar = null;
+              bubble
+                .save()
+                .then(bubble => res.status(201).json(bubble))
+                .catch(err => {
+                  console.log(err);
+                  errors.bubble = 'Bubble can not saved';
+                  return res.status(400).json(errors);
+                });
+            }
+          });
+        }
+      })
+      .catch(err => {
+        errors.bubble = 'Bubble not found';
+        console.log(err);
+        return res.status(400).json(errors);
+      });
+  }
+);
+
 module.exports = router;
