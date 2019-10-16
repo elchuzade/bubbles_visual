@@ -35,6 +35,7 @@ router.post(
       type: 'private'
     };
     let bubble = {
+      user: req.user.id,
       title: 'title',
       access: access
       // bubblePath: req.body.path,
@@ -241,6 +242,23 @@ router.get(
       .then(bubble => res.status(200).json(bubble))
       .catch(err => {
         errors.bubble = 'Bubble not found';
+        console.log(err);
+        return res.status(404).json(errors);
+      });
+  }
+);
+
+// @route GET api/bubbles/
+// @desc Get all bubbles
+router.get(
+  '/',
+  passport.authenticate('jwt', { session: false }),
+  (req, res) => {
+    const errors = {};
+    Bubble.find({ user: req.user.id })
+      .then(bubbles => res.status(200).json(bubbles))
+      .catch(err => {
+        errors.bubble = 'Bubbles not found';
         console.log(err);
         return res.status(404).json(errors);
       });

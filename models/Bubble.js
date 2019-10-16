@@ -4,6 +4,9 @@ const Schema = mongoose.Schema;
 // Create Schema
 const BubbleSchema = new Schema(
   {
+    user: {
+      type: String
+    },
     access: {
       id: {
         type: String
