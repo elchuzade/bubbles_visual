@@ -52,9 +52,9 @@ router.post(
   }
 );
 
-// @route PUT api/bubbles/:id
+// @route POST api/bubbles/:id
 // @desc Update bubble info
-router.put(
+router.post(
   '/:id',
   passport.authenticate('jwt', { session: false }),
   (req, res) => {
@@ -90,9 +90,9 @@ router.put(
   }
 );
 
-// @route PUT api/bubbles/:id/status
-// @desc Change bubble status
-router.put(
+// @route POST api/bubbles/:id/status
+// @desc Update bubble status
+router.post(
   '/:id/status',
   passport.authenticate('jwt', { session: false }),
   (req, res) => {
@@ -124,9 +124,9 @@ router.put(
   }
 );
 
-// @route PUT api/bubbles/:id/importance
-// @desc Change bubble importance
-router.put(
+// @route POST api/bubbles/:id/importance
+// @desc Update bubble importance
+router.post(
   '/:id/importance',
   passport.authenticate('jwt', { session: false }),
   (req, res) => {
@@ -158,9 +158,9 @@ router.put(
   }
 );
 
-// @route PUT api/bubbles/:id/deadline
-// @desc Change bubble deadline
-router.put(
+// @route POST api/bubbles/:id/deadline
+// @desc Update bubble deadline
+router.post(
   '/:id/deadline',
   passport.authenticate('jwt', { session: false }),
   (req, res) => {
@@ -238,6 +238,65 @@ router.get(
         errors.bubble = 'Bubble not found';
         console.log(err);
         return res.status(404).json(errors);
+      });
+  }
+);
+
+// @route POST api/bubbles/:id/avatar
+// @desc Update bubble avatar
+router.post(
+  '/:id/avatar',
+  passport.authenticate('jwt', { session: false }),
+  (req, res) => {
+    const errors = {};
+    Bubble.findById(req.params.id)
+      .then(bubble => {
+        let params = {};
+        if (bubble.avatar && bubble.avatar.key) {
+          params = {
+            Bucket: bubble.avatar.bucket,
+            Delete: {
+              Objects: [{ Key: bubble.avatar.key }]
+            }
+          };
+        }
+        if (params.Delete && params.Delete.Objects.length > 0) {
+          s3.deleteObjects(params, (err, data) => {
+            if (err) console.log(err);
+          });
+        }
+        bubbleAvatar(req, res, err => {
+          if (err) {
+            console.log(err);
+            errors.uploadfail = 'Failed to upload an image';
+            return res.json(errors);
+          }
+          if (req.file == undefined) {
+            console.log(err);
+            errors.selectfail = 'No file selected';
+            return res.json(errors);
+          }
+          bubble.avatar.location = req.file.location;
+          bubble.avatar.key = req.file.key;
+          bubble.avatar.bucket = req.file.bucket;
+          bubble.avatar.originalname = req.file.originalname;
+          bubble.avatar.mimetype = req.file.mimetype;
+          bubble.avatar.size = req.file.size;
+          bubble.avatar.fieldName = req.file.metadata.fieldName;
+          bubble
+            .save()
+            .then(bubble => res.status(201).json(bubble))
+            .catch(err => {
+              console.log(err);
+              errors.bubble = 'Bubble can not saved';
+              return res.status(400).json(errors);
+            });
+        });
+      })
+      .catch(err => {
+        errors.bubble = 'Bubble not found';
+        console.log(err);
+        return res.status(400).json(errors);
       });
   }
 );

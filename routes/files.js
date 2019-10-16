@@ -15,7 +15,7 @@ const s3 = new aws.S3();
 const uploadUserAvatar = multer({
   storage: multerS3({
     s3: s3,
-    bucket: 'bubbles',
+    bucket: 'bubbles-visual-task-manager',
     acl: 'public-read',
     metadata: function(req, file, cb) {
       cb(null, { fieldName: file.fieldname });
@@ -35,7 +35,7 @@ const uploadUserAvatar = multer({
 const uploadBubbleAvatar = multer({
   storage: multerS3({
     s3: s3,
-    bucket: 'bubbles',
+    bucket: 'bubbles-visual-task-manager',
     acl: 'public-read',
     metadata: function(req, file, cb) {
       cb(null, { fieldName: file.fieldname });
