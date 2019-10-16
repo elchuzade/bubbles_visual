@@ -7,6 +7,14 @@ const BubbleSchema = new Schema(
     user: {
       type: String
     },
+    position: {
+      x: {
+        type: Number
+      },
+      y: {
+        type: Number
+      }
+    },
     access: {
       id: {
         type: String
