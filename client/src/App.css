@@ -1,22 +1,37 @@
-.App {
-  text-align: center;
+#plain {
+  position: absolute;
+  margin-left: auto;
+  margin-right: auto;
+  width: 90%;
+  height: 90%;
+  left: 5%;
+  box-shadow: 0px 0px 5px;
 }
 
-.App-logo {
-  height: 40vmin;
+.draggableCover {
+  position: absolute;
+  border: 4px solid darkgreen;
+  border-radius: 50%;
 }
 
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
+.bubbleImage {
+  border: 4px solid grey;
 }
 
-.App-link {
-  color: #09d3ac;
+.bubbleImage:hover {
+  border: none;
+}
+
+.deadline {
+  border: 4px solid orange;
+  border-radius: 50%;
+}
+
+.imgText {
+  position: absolute;
+  background: rgba(255, 255, 255, 0.75);
+  max-width: 80%;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
 }
