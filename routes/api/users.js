@@ -47,6 +47,7 @@ router.post('/register', (req, res) => {
                 .save()
                 .then(bubble => {
                   bubble.page = bubble._id;
+                  bubble.parentPage = bubble._id;
                   bubble
                     .save()
                     .then(bubble => res.status(201).json(user))

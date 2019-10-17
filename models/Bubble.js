@@ -7,6 +7,9 @@ const BubbleSchema = new Schema(
     user: {
       type: String
     },
+    parentPage: {
+      type: String
+    },
     page: {
       type: String
     },
@@ -93,7 +96,7 @@ const BubbleSchema = new Schema(
         }
       }
     ],
-    bubblePath: [
+    path: [
       {
         id: {
           type: String

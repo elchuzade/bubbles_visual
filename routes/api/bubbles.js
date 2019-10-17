@@ -427,19 +427,19 @@ router.post(
   }
 );
 
-// @route POST api/bubbles/:id/page
-// @desc Update bubble page
+// @route POST api/bubbles/:id/parentPage
+// @desc Update bubble parentPage
 router.post(
-  '/:id/page',
+  '/:id/parentPage',
   passport.authenticate('jwt', { session: false }),
   (req, res) => {
     const { errors, isValid } = validatePage(req.body);
     if (!isValid) return res.status(400).json(errors);
-    Bubble.findById(req.body.page)
-      .then(page => {
+    Bubble.findById(req.body.parentPage)
+      .then(parentPage => {
         Bubble.findById(req.params.id)
           .then(bubble => {
-            if (req.body.page) bubble.page = page._id;
+            if (req.body.parentPage) bubble.parentPage = parentPage._id;
             bubble
               .save()
               .then(bubble =>
@@ -462,7 +462,39 @@ router.post(
           });
       })
       .catch(err => {
-        errors.page = 'Page not found';
+        errors.parentPage = 'Page not found';
+        console.log(err);
+        return res.status(404).json(errors);
+      });
+  }
+);
+
+// @route POST api/bubbles/:id/page
+// @desc Make a page with this bubble
+router.post(
+  '/:id/parentPage',
+  passport.authenticate('jwt', { session: false }),
+  (req, res) => {
+    Bubble.findById(req.params.id)
+      .then(bubble => {
+        bubble.page = bubble._id;
+        bubble
+          .save()
+          .then(bubble =>
+            res.status(201).json({
+              item: bubble,
+              action: 'update',
+              message: 'Updated bubble'
+            })
+          )
+          .catch(err => {
+            errors.bubble = 'Bubble can not be saved';
+            console.log(err);
+            return res.status(400).json(errors);
+          });
+      })
+      .catch(err => {
+        errors.bubble = 'Bubble not found';
         console.log(err);
         return res.status(404).json(errors);
       });
