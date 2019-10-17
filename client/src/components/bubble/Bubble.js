@@ -9,16 +9,40 @@ import {
 
 import { getBubble, getPageBubbles } from '../../actions/bubbleActions';
 
-class Bubbles extends Component {
+class Bubble extends Component {
   constructor(props) {
     super(props);
     this.state = {
+      errors: {},
+      bubble: {},
+      pageBubbles: [],
       position: {
         x: 0,
         y: 0
       },
       circleImportance: 200
     };
+  }
+
+  componentDidMount() {
+    if (this.props.match.params.id) {
+      this.props.getBubble(this.props.match.params.id);
+      this.props.getPageBubbles(this.props.match.params.id);
+    }
+  }
+  componentWillReceiveProps(nextProps) {
+    // set errors
+    if (nextProps.errors) {
+      this.setState({ errors: nextProps.errors });
+    }
+    // set parent bubble
+    if (nextProps.bubble && nextProps.bubble.bubble) {
+      this.setState({ bubble: nextProps.bubble.bubble });
+    }
+    // Set page bubbles
+    if (nextProps.bubble && nextProps.bubble.bubbles) {
+      this.setState({ bubbles: nextProps.bubble.bubbles });
+    }
   }
   handleDrag = (e, ui) => {
     this.setState({
@@ -87,6 +111,14 @@ class Bubbles extends Component {
   }
 }
 
+Bubble.propTypes = {
+  auth: PropTypes.object.isRequired,
+  errors: PropTypes.object.isRequired,
+  bubble: PropTypes.object.isRequired,
+  getBubble: PropTypes.func.isRequired,
+  getPageBubbles: PropTypes.func.isRequired
+};
+
 const mapStateToProps = state => ({
   auth: state.auth,
   errors: state.errors,
@@ -96,4 +128,4 @@ const mapStateToProps = state => ({
 export default connect(
   mapStateToProps,
   { getBubble, getPageBubbles }
-)(Bubbles);
+)(Bubble);

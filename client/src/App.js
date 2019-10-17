@@ -8,7 +8,9 @@ import { setCurrentUser, logoutUser } from './actions/authActions';
 import { Provider } from 'react-redux';
 import store from './store';
 
-import Bubbles from './components/bubble/Bubbles';
+import Login from './components/auth/Login';
+import Register from './components/auth/Register';
+import Bubble from './components/bubble/Bubble';
 import NotFound from './components/layout/NotFound';
 
 // Check for token
@@ -35,7 +37,9 @@ const App = () => {
       <div className="App">
         <Router>
           <Switch>
-            <Route path="/" component={Bubbles} />
+            <Route exact path="/register" component={Register} />
+            <Route exact path="/login" component={Login} />
+            <Route exact path="/bubble/:id" component={Bubble} />
             <Route path="*" component={NotFound} />
           </Switch>
         </Router>
