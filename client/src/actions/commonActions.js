@@ -1,7 +1,6 @@
 import {
   GET_ERRORS,
   GET_RESPONSE,
-  BLOGS_LOADING,
   BUBBLE_LOADING
 } from './types';
 

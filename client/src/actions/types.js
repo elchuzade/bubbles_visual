@@ -4,3 +4,6 @@ export const GET_RESPONSE = 'GET_RESPONSE';
 export const SET_CURRENT_USER = 'SET_CURRENT_USER';
 
 export const BUBBLE_LOADING = 'BUBBLE_LOADING';
+
+export const GET_BUBBLE = 'GET_BUBBLE';
+export const GET_BUBBLES = 'GET_BUBBLES';

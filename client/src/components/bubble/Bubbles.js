@@ -1,9 +1,13 @@
 import React, { Component } from 'react';
 import Draggable from 'react-draggable';
+import PropTypes from 'prop-types';
+import { connect } from 'react-redux';
 import {
   PixelToPercent,
   PercentToPixel
 } from '../common/exports/convertPixelPercent';
+
+import { getBubble, getPageBubbles } from '../../actions/bubbleActions';
 
 class Bubbles extends Component {
   constructor(props) {
@@ -82,4 +86,14 @@ class Bubbles extends Component {
     );
   }
 }
-export default Bubbles;
+
+const mapStateToProps = state => ({
+  auth: state.auth,
+  errors: state.errors,
+  bubble: state.bubble
+});
+
+export default connect(
+  mapStateToProps,
+  { getBubble, getPageBubbles }
+)(Bubbles);

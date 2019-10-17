@@ -77,25 +77,6 @@ const BubbleSchema = new Schema(
     deadline: {
       type: Date
     },
-    children: [
-      {
-        id: {
-          type: String
-        },
-        title: {
-          type: String
-        },
-        importance: {
-          type: Number
-        },
-        x: {
-          type: Number
-        },
-        y: {
-          type: Number
-        }
-      }
-    ],
     path: [
       {
         id: {
