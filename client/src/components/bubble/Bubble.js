@@ -1,11 +1,12 @@
 import React, { Component } from 'react';
-import Draggable from 'react-draggable';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import {
   PixelToPercent,
   PercentToPixel
 } from '../common/exports/convertPixelPercent';
+
+import DraggableBubble from './DraggableBubble';
 
 import { getBubble, getPageBubbles } from '../../actions/bubbleActions';
 
@@ -58,17 +59,8 @@ class Bubble extends Component {
   componentWillUnmount() {
     window.removeEventListener('resize', this.handleResize);
   }
-  handleStop = bubble => {
-    let bubblePosition = {
-      x: bubble.position.x,
-      y: bubble.position.y
-    };
-    this.setState({
-      position: bubblePosition,
-      draggingImportance: bubble.importance * this.state.importanceFactor
-    });
-  };
   handleDrag = (e, ui) => {
+    e.preventDefault();
     this.setState({
       position: {
         x: this.state.position.x + ui.deltaX,
@@ -76,7 +68,8 @@ class Bubble extends Component {
       }
     });
   };
-  handleStop = () => {
+  handleStop = (e, ui) => {
+    e.preventDefault();
     let convertedX = PixelToPercent(
       this.state.position.x + this.state.draggingImportance / 2,
       this.state.screenWidth * 0.9
@@ -89,8 +82,8 @@ class Bubble extends Component {
   };
 
   render() {
-    const { errors } = this.state;
-    const { isAuthenticated } = this.props.auth;
+    // const { errors } = this.state;
+    // const { isAuthenticated } = this.props.auth;
     const { bubble, loading } = this.props.bubble;
     let spinner = null;
     if (bubble === null || loading) {
@@ -109,59 +102,39 @@ class Bubble extends Component {
             </div>
           </div>
         </div>
-        <div id="plain">
-          {spinner}
-          {!spinner && (
-            <div>
-              {this.state.pageBubbles &&
-                this.state.pageBubbles.map(bubble => (
-                  <Draggable
-                    key={bubble._id}
-                    handle=".handle"
-                    defaultPosition={{
-                      x:
-                        PercentToPixel(
-                          bubble.position.x,
-                          this.state.screenWidth * 0.9
-                        ) -
-                        (bubble.importance / 2) * this.state.importanceFactor,
-                      y:
-                        PercentToPixel(
-                          bubble.position.y,
-                          this.state.screenHeight * 0.9
-                        ) -
-                        (bubble.importance / 2) * this.state.importanceFactor
-                    }}
-                    position={null}
-                    scale={1}
-                    onStart={this.handleStart}
-                    onDrag={this.handleDrag}
-                    onStop={this.handleStop}
-                    bounds="parent"
-                    onMouseDown={this.mouseDown}
-                  >
-                    <div
-                      className="draggableCover"
-                      style={{
-                        width: `${bubble.importance *
-                          this.state.importanceFactor}px`
-                      }}
-                    >
-                      <div className="deadline">
-                        <img
-                          draggable="false"
-                          src="https://picsum.photos/1000/1000?random=5"
-                          alt="img1"
-                          className="handle img-fluid rounded-circle bubbleImage"
-                        />
-                        <span className="imgText handle">4</span>
-                      </div>
-                    </div>
-                  </Draggable>
-                ))}
-            </div>
-          )}
-        </div>
+        {spinner}
+        {!spinner && (
+          <div id="plain">
+            {this.state.pageBubbles &&
+              this.state.pageBubbles.map(bubble => (
+                <DraggableBubble
+                  key={bubble._id}
+                  bubble={bubble}
+                  importanceFactor={this.state.importanceFactor}
+                  deadline={bubble.deadline ? true : false}
+                  handle=".handle"
+                  defaultPosition={{
+                    x:
+                      PercentToPixel(
+                        bubble.position.x,
+                        this.state.screenWidth * 0.9
+                      ) -
+                      (bubble.importance / 2) * this.state.importanceFactor,
+                    y:
+                      PercentToPixel(
+                        bubble.position.y,
+                        this.state.screenHeight * 0.9
+                      ) -
+                      (bubble.importance / 2) * this.state.importanceFactor
+                  }}
+                  onStart={this.handleStart}
+                  onDrag={this.handleDrag}
+                  onStop={this.handleStop}
+                  bounds="parent"
+                />
+              ))}
+          </div>
+        )}
       </div>
     );
   }

@@ -1,8 +1,4 @@
-import {
-  GET_ERRORS,
-  GET_RESPONSE,
-  BUBBLE_LOADING
-} from './types';
+import { GET_ERRORS, GET_RESPONSE, BUBBLE_LOADING } from './types';
 
 export const refreshErrors = () => {
   return {
@@ -39,5 +35,7 @@ export const setLoading = data => {
         type: BUBBLE_LOADING
       };
     }
+    default:
+      return;
   }
 };

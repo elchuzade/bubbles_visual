@@ -14,14 +14,6 @@
   border-radius: 50%;
 }
 
-.bubbleImage {
-  border: 4px solid grey;
-}
-
-.bubbleImage:hover {
-  border: none;
-}
-
 .deadline {
   border: 4px solid orange;
   border-radius: 50%;
