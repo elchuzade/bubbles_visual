@@ -58,21 +58,21 @@ router.post(
       bubblePath: bubblePath,
       parent: parentBubble
     };
-    Bubble.findById(bubble.parent.id)
-      .then(parentBubble => {
-        parentBubble.children.push({
-          id: bubble._id,
-          position: {
-            x: bubble.position.x,
-            y: bubble.position.y
-          }
-        });
-        parentBubble
-          .save()
+    new Bubble(bubble)
+      .save()
+      .then(bubble => {
+        Bubble.findById(bubble.parent.id)
           .then(parentBubble => {
-            new Bubble(bubble)
+            parentBubble.children.push({
+              id: bubble._id,
+              position: {
+                x: bubble.position.x,
+                y: bubble.position.y
+              }
+            });
+            parentBubble
               .save()
-              .then(bubble =>
+              .then(parentBubble =>
                 res.status(201).json({
                   item: bubble,
                   action: 'add',
@@ -80,21 +80,21 @@ router.post(
                 })
               )
               .catch(err => {
-                errors.bubble = 'Bubble can not be saved';
+                errors.bubble = 'Parent bubble can not be saved';
                 console.log(err);
                 return res.status(400).json(errors);
               });
           })
           .catch(err => {
-            errors.bubble = 'Parent bubble can not be saved';
+            errors.bubble = 'Parent bubble not found';
             console.log(err);
-            return res.status(400).json(errors);
+            return res.status(404).json(errors);
           });
       })
       .catch(err => {
-        errors.bubble = 'Parent bubble not found';
+        errors.bubble = 'Bubble can not be saved';
         console.log(err);
-        return res.status(404).json(errors);
+        return res.status(400).json(errors);
       });
   }
 );
