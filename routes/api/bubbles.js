@@ -58,19 +58,43 @@ router.post(
       bubblePath: bubblePath,
       parent: parentBubble
     };
-    new Bubble(bubble)
-      .save()
-      .then(bubble =>
-        res.status(201).json({
-          item: bubble,
-          action: 'add',
-          message: 'Added bubble'
-        })
-      )
+    Bubble.findById(bubble.parent.id)
+      .then(parentBubble => {
+        parentBubble.children.push({
+          id: bubble._id,
+          position: {
+            x: bubble.position.x,
+            y: bubble.position.y
+          }
+        });
+        parentBubble
+          .save()
+          .then(parentBubble => {
+            new Bubble(bubble)
+              .save()
+              .then(bubble =>
+                res.status(201).json({
+                  item: bubble,
+                  action: 'add',
+                  message: 'Added bubble'
+                })
+              )
+              .catch(err => {
+                errors.bubble = 'Bubble can not be saved';
+                console.log(err);
+                return res.status(400).json(errors);
+              });
+          })
+          .catch(err => {
+            errors.bubble = 'Parent bubble can not be saved';
+            console.log(err);
+            return res.status(400).json(errors);
+          });
+      })
       .catch(err => {
-        errors.bubble = 'Bubble can not be saved';
+        errors.bubble = 'Parent bubble not found';
         console.log(err);
-        return res.status(400).json(errors);
+        return res.status(404).json(errors);
       });
   }
 );
@@ -550,7 +574,7 @@ router.post(
                       });
                   })
                   .catch(err => {
-                    errors.bubble = "Bubble's parent can not be saved";
+                    errors.bubble = 'Parent bubble can not be saved';
                     console.log(err);
                     return res.status(400).json(errors);
                   });
@@ -558,7 +582,7 @@ router.post(
             }
           })
           .catch(err => {
-            errors.bubble = "Bubble's parent not found";
+            errors.bubble = 'Parent bubble not found';
             console.log(err);
             return res.status(404).json(errors);
           });
