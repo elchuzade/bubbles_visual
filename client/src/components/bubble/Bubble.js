@@ -11,7 +11,8 @@ import DraggableBubble from './DraggableBubble';
 import {
   getBubble,
   getPageBubbles,
-  updatePosition
+  updatePosition,
+  createBubble
 } from '../../actions/bubbleActions';
 
 class Bubble extends Component {
@@ -71,12 +72,10 @@ class Bubble extends Component {
       y: PixelToPercent(bubbleCenterY, this.state.plainHeight)
     };
     this.props.updatePosition(draggedBubble._id, draggedBubblePosition);
-    console.log(
-      PixelToPercent(bubbleCenterX, this.state.plainWidth),
-      PixelToPercent(bubbleCenterY, this.state.plainHeight)
-    );
   };
-
+  createBubble = () => {
+    this.props.createBubble(this.state.bubble);
+  };
   render() {
     // const { errors } = this.state;
     // const { isAuthenticated } = this.props.auth;
@@ -92,7 +91,10 @@ class Bubble extends Component {
         <div className="container">
           <div className="row">
             <div className="col-12 my-2">
-              <button className="btn btn-sm btn-success">
+              <button
+                className="btn btn-sm btn-success"
+                onClick={this.createBubble}
+              >
                 <i className="fas fa-plus"></i>
               </button>
             </div>
@@ -139,7 +141,8 @@ Bubble.propTypes = {
   bubble: PropTypes.object.isRequired,
   getBubble: PropTypes.func.isRequired,
   getPageBubbles: PropTypes.func.isRequired,
-  updatePosition: PropTypes.func.isRequired
+  updatePosition: PropTypes.func.isRequired,
+  createBubble: PropTypes.func.isRequired
 };
 
 const mapStateToProps = state => ({
@@ -150,5 +153,5 @@ const mapStateToProps = state => ({
 
 export default connect(
   mapStateToProps,
-  { getBubble, getPageBubbles, updatePosition }
+  { getBubble, getPageBubbles, updatePosition, createBubble }
 )(Bubble);

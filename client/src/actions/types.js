@@ -8,3 +8,4 @@ export const BUBBLE_LOADING = 'BUBBLE_LOADING';
 export const GET_BUBBLE = 'GET_BUBBLE';
 export const GET_BUBBLES = 'GET_BUBBLES';
 export const UPDATE_POSITION = 'UPDATE_POSITION';
+export const CREATE_BUBBLE = 'CREATE_BUBBLE';

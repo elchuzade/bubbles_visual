@@ -8,7 +8,12 @@ import {
   setLoading
 } from './commonActions';
 
-import { GET_BUBBLE, GET_BUBBLES, UPDATE_POSITION } from './types';
+import {
+  GET_BUBBLE,
+  GET_BUBBLES,
+  UPDATE_POSITION,
+  CREATE_BUBBLE
+} from './types';
 
 const refreshAll = () => dispatch => {
   dispatch(refreshErrors());
@@ -63,3 +68,17 @@ export const updatePosition = (id, position) => dispatch => {
     });
 };
 
+export const createBubble = bubble => dispatch => {
+  refreshAll();
+  axios
+    .post(`/api/bubbles/`, bubble)
+    .then(res => {
+      dispatch({
+        type: CREATE_BUBBLE,
+        payload: res.data
+      });
+    })
+    .catch(err => {
+      dispatch(getError(err.response.data));
+    });
+};

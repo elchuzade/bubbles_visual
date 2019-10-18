@@ -31,7 +31,7 @@ router.post(
   '/',
   passport.authenticate('jwt', { session: false }),
   (req, res) => {
-    const { errors, isValid } = validateParent(req.body.parent);
+    let { errors, isValid } = validateParent(req.body);
     if (!isValid) return res.status(400).json(errors);
     errors, (isValid = validatePath(req.body));
     if (!isValid) return res.status(400).json(errors);
@@ -39,15 +39,24 @@ router.post(
     let access = {
       type: 'private'
     };
+    let bubblePath = req.body.path;
+    let parentBubble = {
+      id: req.body._id,
+      title: req.body.title
+    };
+    let bubblePosition = {
+      x: 25, // later should be some formula to find free spot
+      y: 25 // later should be some formula to find free spot
+    };
+    bubblePath.push(parentBubble);
     let bubble = {
       user: req.user.id,
-      x: 25, // later should be some formula to find free spot
-      y: 25, // later should be some formula to find free spot
+      position: bubblePosition,
       title: 'title',
       access: access,
-      page: req.body.parent._id
-      // bubblePath: req.body.path,
-      // parent: req.body.bubblePath[req.body.bubblePath.length - 1]
+      parentPage: req.body._id,
+      bubblePath: bubblePath,
+      parent: parentBubble
     };
     new Bubble(bubble)
       .save()

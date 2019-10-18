@@ -2,7 +2,8 @@ import {
   GET_BUBBLE,
   GET_BUBBLES,
   BUBBLE_LOADING,
-  UPDATE_POSITION
+  UPDATE_POSITION,
+  CREATE_BUBBLE
 } from '../actions/types';
 
 const initialState = {
@@ -33,12 +34,6 @@ export default (state = initialState, action) => {
     case UPDATE_POSITION: {
       let updatedBubbles = state.bubbles;
       for (let i = 0; i < updatedBubbles; i++) {
-        console.log(
-          updatedBubbles[i]._id,
-          typeof updatedBubbles[i]._id,
-          action.payload._id,
-          typeof action.payload._id
-        );
         if (updatedBubbles[i]._id === action.payload._id) {
           updatedBubbles[i].position = action.payload.position;
           return {
@@ -49,6 +44,14 @@ export default (state = initialState, action) => {
       }
       return {
         ...state
+      };
+    }
+    case CREATE_BUBBLE: {
+      let updatedBubbles = state.bubbles;
+      updatedBubbles.push(action.payload.item);
+      return {
+        ...state,
+        bubbles: updatedBubbles
       };
     }
     default:
