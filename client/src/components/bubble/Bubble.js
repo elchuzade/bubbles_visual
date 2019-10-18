@@ -65,17 +65,16 @@ class Bubble extends Component {
   }
   handleStop = (e, ui) => {
     e.preventDefault();
-    const draggedBubble = JSON.parse(ui.node.attributes[0].nodeValue);
+    const id = ui.node.attributes[0].nodeValue;
+    const importance = ui.node.attributes[1].nodeValue;
     // Access bubble attribute of a DOM element
-    let bubbleCenterX =
-      ui.x + (draggedBubble.importance / 2) * this.state.importanceFactor;
-    let bubbleCenterY =
-      ui.y + (draggedBubble.importance / 2) * this.state.importanceFactor;
+    let bubbleCenterX = ui.x + (importance / 2) * this.state.importanceFactor;
+    let bubbleCenterY = ui.y + (importance / 2) * this.state.importanceFactor;
     let draggedBubblePosition = {
       x: PixelToPercent(bubbleCenterX, this.state.plainWidth),
       y: PixelToPercent(bubbleCenterY, this.state.plainHeight)
     };
-    this.props.updatePosition(draggedBubble._id, draggedBubblePosition);
+    this.props.updatePosition(id, draggedBubblePosition);
   };
   createBubble = () => {
     this.props.createBubble(this.state.bubble);
@@ -101,6 +100,9 @@ class Bubble extends Component {
               >
                 <i className="fas fa-plus"></i>
               </button>
+              <span className="ml-5">
+                HOVERING STATUS {this.state.hoverOn && 'ON'}
+              </span>
             </div>
           </div>
         </div>
@@ -112,26 +114,38 @@ class Bubble extends Component {
               this.state.bubble.children.length > 0 &&
               this.state.bubble.children.map(child => (
                 <Line
-                  key={child._id}
+                  key={child.id}
                   x0={
                     this.state.leftOffset +
-                    PercentToPixel(this.state.bubble.position.x, this.state.plainWidth)
+                    PercentToPixel(
+                      this.state.bubble.position.x,
+                      this.state.plainWidth
+                    )
                   }
                   y0={
                     this.state.topOffset +
-                    PercentToPixel(this.state.bubble.position.y, this.state.plainHeight)
+                    PercentToPixel(
+                      this.state.bubble.position.y,
+                      this.state.plainHeight
+                    )
                   }
-                  x1={this.state.leftOffset +
-                    PercentToPixel(child.position.x, this.state.plainWidth)}
-                  y1={this.state.topOffset +
-                    PercentToPixel(child.position.y, this.state.plainHeight)}
+                  x1={
+                    this.state.leftOffset +
+                    PercentToPixel(child.position.x, this.state.plainWidth)
+                  }
+                  y1={
+                    this.state.topOffset +
+                    PercentToPixel(child.position.y, this.state.plainHeight)
+                  }
                 />
               ))}
             {this.state.pageBubbles &&
               this.state.pageBubbles.map(bubble => (
                 <DraggableBubble
                   key={bubble._id}
-                  bubble={JSON.stringify(bubble)}
+                  importance={bubble.importance}
+                  title={bubble.title}
+                  id={bubble._id}
                   importanceFactor={this.state.importanceFactor}
                   deadline={bubble.deadline ? true : false}
                   handle=".handle"

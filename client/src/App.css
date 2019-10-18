@@ -10,7 +10,6 @@
 
 .draggableCover {
   position: absolute;
-  /* border: 4px solid darkgreen; */
   border-radius: 50%;
 }
 
@@ -28,10 +27,16 @@
   background: rgba(255, 255, 255, 0.75);
   max-width: 80%;
   left: 50%;
-  top: 50%;
   transform: translate(-50%, -50%);
 }
 
+.bubbleDashboardBtn {
+  border-radius: 50%;
+  width: 31px;
+  height: 31px;
+}
+
+/* -------- LOADER -------- */
 .loader {
   color: rgb(108, 117, 125);
   font-size: 45px;
