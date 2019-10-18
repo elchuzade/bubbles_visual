@@ -8,29 +8,28 @@ import {
 
 import DraggableBubble from './DraggableBubble';
 
-import { getBubble, getPageBubbles } from '../../actions/bubbleActions';
+import {
+  getBubble,
+  getPageBubbles,
+  updatePosition
+} from '../../actions/bubbleActions';
 
 class Bubble extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      screenWidth: undefined,
-      screenHeight: undefined,
+      plainWidth: undefined,
+      plainHeight: undefined,
       importanceFactor: undefined,
       errors: {},
       bubble: {},
-      pageBubbles: [],
-      position: {
-        x: 0,
-        y: 0
-      },
-      draggingImportance: undefined
+      pageBubbles: []
     };
   }
   handleResize = () => {
     this.setState({
-      screenWidth: window.innerWidth,
-      screenHeight: window.innerHeight,
+      plainWidth: window.innerWidth * 0.9,
+      plainHeight: window.innerHeight * 0.9,
       importanceFactor: window.innerWidth * 0.9 * 0.002
     });
   };
@@ -59,26 +58,23 @@ class Bubble extends Component {
   componentWillUnmount() {
     window.removeEventListener('resize', this.handleResize);
   }
-  handleDrag = (e, ui) => {
-    e.preventDefault();
-    this.setState({
-      position: {
-        x: this.state.position.x + ui.deltaX,
-        y: this.state.position.y + ui.deltaY
-      }
-    });
-  };
   handleStop = (e, ui) => {
     e.preventDefault();
-    let convertedX = PixelToPercent(
-      this.state.position.x + this.state.draggingImportance / 2,
-      this.state.screenWidth * 0.9
+    const draggedBubble = JSON.parse(ui.node.attributes[0].nodeValue);
+    // Access bubble attribute of a DOM element
+    let bubbleCenterX =
+      ui.x + (draggedBubble.importance / 2) * this.state.importanceFactor;
+    let bubbleCenterY =
+      ui.y + (draggedBubble.importance / 2) * this.state.importanceFactor;
+    let draggedBubblePosition = {
+      x: PixelToPercent(bubbleCenterX, this.state.plainWidth),
+      y: PixelToPercent(bubbleCenterY, this.state.plainHeight)
+    };
+    this.props.updatePosition(draggedBubble._id, draggedBubblePosition);
+    console.log(
+      PixelToPercent(bubbleCenterX, this.state.plainWidth),
+      PixelToPercent(bubbleCenterY, this.state.plainHeight)
     );
-    let convertedY = PixelToPercent(
-      this.state.position.y + this.state.draggingImportance / 2,
-      this.state.screenHeight * 0.9
-    );
-    console.log(convertedX, convertedY);
   };
 
   render() {
@@ -108,22 +104,19 @@ class Bubble extends Component {
             {this.state.pageBubbles &&
               this.state.pageBubbles.map(bubble => (
                 <DraggableBubble
+                  bubble={JSON.stringify(bubble)}
                   key={bubble._id}
-                  bubble={bubble}
                   importanceFactor={this.state.importanceFactor}
                   deadline={bubble.deadline ? true : false}
                   handle=".handle"
                   defaultPosition={{
                     x:
-                      PercentToPixel(
-                        bubble.position.x,
-                        this.state.screenWidth * 0.9
-                      ) -
+                      PercentToPixel(bubble.position.x, this.state.plainWidth) -
                       (bubble.importance / 2) * this.state.importanceFactor,
                     y:
                       PercentToPixel(
                         bubble.position.y,
-                        this.state.screenHeight * 0.9
+                        this.state.plainHeight
                       ) -
                       (bubble.importance / 2) * this.state.importanceFactor
                   }}
@@ -145,7 +138,8 @@ Bubble.propTypes = {
   errors: PropTypes.object.isRequired,
   bubble: PropTypes.object.isRequired,
   getBubble: PropTypes.func.isRequired,
-  getPageBubbles: PropTypes.func.isRequired
+  getPageBubbles: PropTypes.func.isRequired,
+  updatePosition: PropTypes.func.isRequired
 };
 
 const mapStateToProps = state => ({
@@ -156,5 +150,5 @@ const mapStateToProps = state => ({
 
 export default connect(
   mapStateToProps,
-  { getBubble, getPageBubbles }
+  { getBubble, getPageBubbles, updatePosition }
 )(Bubble);

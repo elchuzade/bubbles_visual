@@ -4,24 +4,21 @@ const isEmpty = require('./is-empty');
 module.exports = function validatePosition(data) {
   let errors = {};
 
-  data.position.x = !isEmpty(data.position.x) ? data.position.x : '';
-  data.position.y = !isEmpty(data.position.y) ? data.position.y : '';
+  data.x = !isEmpty(data.x) ? data.x.toString() : '';
+  data.y = !isEmpty(data.y) ? data.y.toString() : '';
 
   let options = {
     min: 0,
     max: 100,
     allow_leading_zeroes: false
   };
-  if (
-    !Validator.isInt(data.position.x, options) ||
-    !Validator.isInt(data.position.y, options)
-  ) {
+  if (!Validator.isFloat(data.x, options) || !Validator.isFloat(data.y, options)) {
     errors.position = 'Position is invalid';
   }
-  if (Validator.isEmpty(data.position.x)) {
+  if (Validator.isEmpty(data.x)) {
     errors.position = 'Position X can not be empty';
   }
-  if (Validator.isEmpty(data.position.y)) {
+  if (Validator.isEmpty(data.y)) {
     errors.position = 'Position Y can not be empty';
   }
 

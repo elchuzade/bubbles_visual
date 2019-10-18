@@ -509,11 +509,10 @@ router.post(
   (req, res) => {
     const { errors, isValid } = validatePosition(req.body);
     if (!isValid) return res.status(400).json(errors);
-
     Bubble.findById(req.params.id)
       .then(bubble => {
-        if (req.body.position.x) bubble.position.x = req.body.position.x;
-        if (req.body.position.y) bubble.position.y = req.body.position.y;
+        if (req.body.x) bubble.position.x = req.body.x;
+        if (req.body.y) bubble.position.y = req.body.y;
         bubble
           .save()
           .then(bubble =>

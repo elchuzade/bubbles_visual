@@ -25,20 +25,22 @@ const DraggableBubble = ({
       bounds={bounds}
     >
       <div
+        bubble={bubble}
         className="draggableCover"
         style={{
-          width: `${bubble.importance * importanceFactor}px`
+          width: `${JSON.parse(bubble).importance * importanceFactor}px`
         }}
       >
-        <div className={classnames({ deadline: deadline })}>
+        <div bubble={bubble} className={classnames({ deadline: deadline })}>
           <img
+            bubble={bubble}
             draggable="false"
             src="https://picsum.photos/1000/1000?random=5"
-            alt={bubble.title}
+            alt={JSON.parse(bubble).title}
             className="handle img-fluid rounded-circle bubbleImage"
           />
-          <span className="imgText handle">
-            {bubble.title}
+          <span bubble={bubble} className="imgText handle">
+            {JSON.parse(bubble).title}
           </span>
         </div>
       </div>
@@ -47,13 +49,13 @@ const DraggableBubble = ({
 };
 
 DraggableBubble.propTypes = {
-  bubble: PropTypes.object.isRequired,
+  bubble: PropTypes.string.isRequired,
   importanceFactor: PropTypes.number.isRequired,
   deadline: PropTypes.bool.isRequired,
   handle: PropTypes.string.isRequired,
   defaultPosition: PropTypes.object.isRequired,
   onStart: PropTypes.func,
-  onDrag: PropTypes.func.isRequired,
+  onDrag: PropTypes.func,
   onStop: PropTypes.func,
   bounds: PropTypes.string
 };
