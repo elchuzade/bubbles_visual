@@ -66,6 +66,21 @@ const BubbleSchema = new Schema(
         type: String
       }
     },
+    children: [
+      {
+        id: {
+          type: String
+        },
+        position: {
+          x: {
+            type: Number
+          },
+          y: {
+            type: Number
+          }
+        }
+      }
+    ],
     status: {
       type: String,
       default: 'incomplete'

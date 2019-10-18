@@ -5,6 +5,7 @@ import {
   PixelToPercent,
   PercentToPixel
 } from '../common/exports/convertPixelPercent';
+import { Line } from 'react-lineto';
 
 import DraggableBubble from './DraggableBubble';
 
@@ -19,6 +20,8 @@ class Bubble extends Component {
   constructor(props) {
     super(props);
     this.state = {
+      leftOffset: undefined,
+      topOffset: 50,
       plainWidth: undefined,
       plainHeight: undefined,
       importanceFactor: undefined,
@@ -29,6 +32,7 @@ class Bubble extends Component {
   }
   handleResize = () => {
     this.setState({
+      leftOffset: window.innerWidth * 0.05,
       plainWidth: window.innerWidth * 0.9,
       plainHeight: window.innerHeight * 0.9,
       importanceFactor: window.innerWidth * 0.9 * 0.002
@@ -88,7 +92,7 @@ class Bubble extends Component {
     }
     return (
       <div>
-        <div className="container">
+        <div className="container dashboard">
           <div className="row">
             <div className="col-12 my-2">
               <button
@@ -103,11 +107,31 @@ class Bubble extends Component {
         {spinner}
         {!spinner && (
           <div id="plain">
+            {this.state.bubble &&
+              this.state.bubble.children &&
+              this.state.bubble.children.length > 0 &&
+              this.state.bubble.children.map(child => (
+                <Line
+                  key={child._id}
+                  x0={
+                    this.state.leftOffset +
+                    PercentToPixel(this.state.bubble.position.x, this.state.plainWidth)
+                  }
+                  y0={
+                    this.state.topOffset +
+                    PercentToPixel(this.state.bubble.position.y, this.state.plainHeight)
+                  }
+                  x1={this.state.leftOffset +
+                    PercentToPixel(child.position.x, this.state.plainWidth)}
+                  y1={this.state.topOffset +
+                    PercentToPixel(child.position.y, this.state.plainHeight)}
+                />
+              ))}
             {this.state.pageBubbles &&
               this.state.pageBubbles.map(bubble => (
                 <DraggableBubble
-                  bubble={JSON.stringify(bubble)}
                   key={bubble._id}
+                  bubble={JSON.stringify(bubble)}
                   importanceFactor={this.state.importanceFactor}
                   deadline={bubble.deadline ? true : false}
                   handle=".handle"

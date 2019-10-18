@@ -19,6 +19,10 @@
   border-radius: 50%;
 }
 
+.dashboard {
+  height: 50px;
+}
+
 .imgText {
   position: absolute;
   background: rgba(255, 255, 255, 0.75);
