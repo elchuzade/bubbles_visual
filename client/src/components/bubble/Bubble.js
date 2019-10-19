@@ -6,7 +6,7 @@ import {
   PercentToPixel
 } from '../common/exports/convertPixelPercent';
 import { Line } from 'react-lineto';
-
+import ReactHtmlParser from 'react-html-parser';
 import DraggableBubble from './DraggableBubble';
 
 import {
@@ -29,7 +29,8 @@ class Bubble extends Component {
       bubble: {},
       pageBubbles: [],
       moveBubbles: false,
-      movedBubbles: []
+      movedBubbles: [],
+      selectedBubble: {}
     };
   }
   handleResize = () => {
@@ -59,15 +60,10 @@ class Bubble extends Component {
     }
     // Set page bubbles
     if (nextProps.bubble && nextProps.bubble.bubbles) {
-      this.setState(
-        {
-          pageBubbles: nextProps.bubble.bubbles,
-          movedBubbles: nextProps.bubble.bubbles
-        },
-        () => {
-          console.log(this.state.movedBubbles);
-        }
-      );
+      this.setState({
+        pageBubbles: nextProps.bubble.bubbles,
+        movedBubbles: nextProps.bubble.bubbles
+      });
     }
   }
   componentWillUnmount() {
@@ -86,7 +82,7 @@ class Bubble extends Component {
     };
     let { movedBubbles } = this.state;
     for (let i = 0; i < movedBubbles.length; i++) {
-      if (movedBubbles[i]._id == id) {
+      if (movedBubbles[i]._id === id) {
         movedBubbles[i].position.x = draggedBubblePosition.x;
         movedBubbles[i].position.y = draggedBubblePosition.y;
         movedBubbles[i].refresh = true;
@@ -106,11 +102,39 @@ class Bubble extends Component {
     const { movedBubbles } = this.state;
     for (let i = 0; i < movedBubbles.length; i++) {
       if (movedBubbles[i].refresh) {
-        this.props.updatePosition(movedBubbles[i]._id, movedBubbles[i].position);
+        this.props.updatePosition(
+          movedBubbles[i]._id,
+          movedBubbles[i].position
+        );
       }
     }
   };
-  resetBubbles = () => {};
+  resetBubbles = () => {
+    this.forceUpdate();
+  };
+  selectBubbleInfo = bubble => {
+    this.setState({ selectedBubble: bubble });
+  };
+  getParentPage = id => {
+    const { pageBubbles } = this.state;
+    for (let i = 0; i < pageBubbles.length; i++) {
+      if (pageBubbles[i]._id === id) {
+        return pageBubbles[i].title;
+      }
+    }
+    return undefined;
+  };
+  getPath = bubble => {
+    let { path } = bubble;
+    path.push({ id: bubble._id, title: bubble.title });
+    let answer = ``;
+    for (let i = 0; i < path.length; i++) {
+      answer += `<span>${path[i].title}</span>`;
+      answer += ` / `;
+    }
+    console.log(typeof answer);
+    return answer;
+  };
   render() {
     // const { errors } = this.state;
     // const { isAuthenticated } = this.props.auth;
@@ -132,9 +156,6 @@ class Bubble extends Component {
               >
                 <i className="fas fa-plus"></i>
               </button>
-              <span className="ml-5">
-                HOVERING STATUS {this.state.hoverOn && 'ON'}
-              </span>
               {this.state.moveBubbles ? (
                 <span>
                   <button
@@ -163,67 +184,118 @@ class Bubble extends Component {
         </div>
         {spinner}
         {!spinner && (
-          <div id="plain">
-            {this.state.bubble &&
-              this.state.bubble.children &&
-              this.state.bubble.children.length > 0 &&
-              this.state.bubble.children.map(child => (
-                <Line
-                  zIndex={-1}
-                  key={child.id}
-                  x0={
-                    this.state.leftOffset +
-                    PercentToPixel(
-                      this.state.bubble.position.x,
-                      this.state.plainWidth
-                    )
-                  }
-                  y0={
-                    this.state.topOffset +
-                    PercentToPixel(
-                      this.state.bubble.position.y,
-                      this.state.plainHeight
-                    )
-                  }
-                  x1={
-                    this.state.leftOffset +
-                    PercentToPixel(child.position.x, this.state.plainWidth)
-                  }
-                  y1={
-                    this.state.topOffset +
-                    PercentToPixel(child.position.y, this.state.plainHeight)
-                  }
-                />
-              ))}
-            {this.state.pageBubbles &&
-              this.state.pageBubbles.map(bubble => (
-                <DraggableBubble
-                  key={bubble._id}
-                  importance={bubble.importance}
-                  title={bubble.title}
-                  id={bubble._id}
-                  importanceFactor={this.state.importanceFactor}
-                  deadline={bubble.deadline ? true : false}
-                  handle=".handle"
-                  disabled={!this.state.moveBubbles}
-                  defaultPosition={{
-                    x:
-                      PercentToPixel(bubble.position.x, this.state.plainWidth) -
-                      (bubble.importance / 2) * this.state.importanceFactor,
-                    y:
+          <section id="bubbles">
+            <div id="plain">
+              {this.state.bubble &&
+                this.state.bubble.children &&
+                this.state.bubble.children.length > 0 &&
+                this.state.bubble.children.map(child => (
+                  <Line
+                    zIndex={-1}
+                    key={child.id}
+                    x0={
+                      this.state.leftOffset +
                       PercentToPixel(
-                        bubble.position.y,
+                        this.state.bubble.position.x,
+                        this.state.plainWidth
+                      )
+                    }
+                    y0={
+                      this.state.topOffset +
+                      PercentToPixel(
+                        this.state.bubble.position.y,
                         this.state.plainHeight
-                      ) -
-                      (bubble.importance / 2) * this.state.importanceFactor
-                  }}
-                  onStart={this.handleStart}
-                  onDrag={this.handleDrag}
-                  onStop={this.handleStop}
-                  bounds="parent"
-                />
-              ))}
-          </div>
+                      )
+                    }
+                    x1={
+                      this.state.leftOffset +
+                      PercentToPixel(child.position.x, this.state.plainWidth)
+                    }
+                    y1={
+                      this.state.topOffset +
+                      PercentToPixel(child.position.y, this.state.plainHeight)
+                    }
+                  />
+                ))}
+              {this.state.pageBubbles &&
+                this.state.pageBubbles.map(bubble => (
+                  <DraggableBubble
+                    key={bubble._id}
+                    selectBubbleInfo={this.selectBubbleInfo}
+                    bubble={bubble}
+                    importanceFactor={this.state.importanceFactor}
+                    handle=".handle"
+                    disabled={!this.state.moveBubbles}
+                    defaultPosition={{
+                      x:
+                        PercentToPixel(
+                          bubble.position.x,
+                          this.state.plainWidth
+                        ) -
+                        (bubble.importance / 2) * this.state.importanceFactor,
+                      y:
+                        PercentToPixel(
+                          bubble.position.y,
+                          this.state.plainHeight
+                        ) -
+                        (bubble.importance / 2) * this.state.importanceFactor
+                    }}
+                    onStart={this.handleStart}
+                    onDrag={this.handleDrag}
+                    onStop={this.handleStop}
+                    bounds="parent"
+                  />
+                ))}
+            </div>
+          </section>
+        )}
+        {!spinner && Object.keys(this.state.selectedBubble).length > 0 && (
+          <section id="bubbleInfo" style={{ marginTop: window.innerHeight }}>
+            <div className="container">
+              <div className="row">
+                <div className="col-12">
+                  <div className="row">
+                    <div className="col-3">
+                      <img
+                        src="https://via.placeholder.com/1000"
+                        alt="img"
+                        className="img-fluid rounded-circle"
+                      />
+                    </div>
+                    <div className="col-9">
+                      <h1>{this.state.selectedBubble.title}</h1>
+                      <p>{this.state.selectedBubble.deadline}</p>
+                      <p>
+                        <i>parent: </i>
+                        <b>{this.state.selectedBubble.parent.title}</b>
+                      </p>
+                      <p>
+                        <i>status: </i>
+                        <b>{this.state.selectedBubble.status}</b>
+                      </p>
+                      <p>
+                        <i>path: </i>
+                        <b>
+                          {ReactHtmlParser(
+                            this.getPath(this.state.selectedBubble)
+                          )}
+                        </b>
+                      </p>
+                      <p>
+                        <i>page: </i>
+                        <b>
+                          {this.getParentPage(
+                            this.state.selectedBubble.parentPage
+                          )}
+                        </b>
+                      </p>
+                      <p>importance</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
         )}
       </div>
     );

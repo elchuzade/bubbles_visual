@@ -11,11 +11,9 @@ class DraggableBubble extends Component {
     };
   }
   hoverOn = () => {
-    console.log('hover on');
     this.setState({ hover: true });
   };
   hoverOff = () => {
-    console.log('hover off');
     this.setState({ hover: false });
   };
   render() {
@@ -32,14 +30,14 @@ class DraggableBubble extends Component {
       >
         <div
           onMouseLeave={this.hoverOff}
-          id={this.props.id}
-          importance={this.props.importance}
+          id={this.props.bubble._id}
+          importance={this.props.bubble.importance}
           className="draggableCover"
         >
-          <div className={classnames({ deadline: this.props.deadline })}>
+          <div className={classnames({ deadline: this.props.bubble.deadline })}>
             <div
               style={{
-                width: `${this.props.importance *
+                width: `${this.props.bubble.importance *
                   this.props.importanceFactor}px`
               }}
             >
@@ -47,21 +45,26 @@ class DraggableBubble extends Component {
                 onMouseEnter={this.hoverOn}
                 draggable="false"
                 src="https://via.placeholder.com/1000"
-                alt={this.props.title}
+                alt={this.props.bubble.title}
                 className="handle img-fluid rounded-circle bubbleImage"
               />
               <span
                 style={{
-                  top: `${(this.props.importance / 2) *
+                  top: `${(this.props.bubble.importance / 2) *
                     this.props.importanceFactor}px`
                 }}
                 className="imgText handle"
               >
-                {this.props.title}
+                {this.props.bubble.title}
               </span>
               {this.state.hover && (
                 <div className="bubbleDashboard mt-1">
-                  <button className="btn btn-sm btn-info bubbleDashboardBtn mr-1 mb-1">
+                  <button
+                    className="btn btn-sm btn-info bubbleDashboardBtn mr-1 mb-1"
+                    onClick={() => {
+                      this.props.selectBubbleInfo(this.props.bubble);
+                    }}
+                  >
                     <i className="fas fa-info"></i>
                   </button>
                   <button className="btn btn-sm btn-info bubbleDashboardBtn mr-1 mb-1">
@@ -81,17 +84,15 @@ class DraggableBubble extends Component {
 }
 
 DraggableBubble.propTypes = {
-  id: PropTypes.string.isRequired,
-  importance: PropTypes.number.isRequired,
-  title: PropTypes.string.isRequired,
+  bubble: PropTypes.object.isRequired,
   importanceFactor: PropTypes.number.isRequired,
-  deadline: PropTypes.bool.isRequired,
   handle: PropTypes.string.isRequired,
   disabled: PropTypes.bool.isRequired,
   defaultPosition: PropTypes.object.isRequired,
   onStart: PropTypes.func,
   onDrag: PropTypes.func,
   onStop: PropTypes.func,
+  selectBubbleInfo: PropTypes.func.isRequired,
   bounds: PropTypes.string
 };
 
