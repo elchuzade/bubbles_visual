@@ -87,7 +87,7 @@ const BubbleSchema = new Schema(
     },
     importance: {
       type: Number,
-      default: 25
+      default: 30
     },
     deadline: {
       type: Date

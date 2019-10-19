@@ -7,14 +7,6 @@ class DraggableBubble extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      id: '',
-      importance: '',
-      title: '',
-      importanceFactor: '',
-      deadline: false,
-      handle: '',
-      defaultPosition: {},
-      bounds: '',
       hover: false
     };
   }
@@ -30,6 +22,7 @@ class DraggableBubble extends Component {
     return (
       <Draggable
         handle={this.props.handle}
+        disabled={this.props.disabled}
         defaultPosition={this.props.defaultPosition}
         scale={1}
         onStart={this.props.onStart}
@@ -53,7 +46,7 @@ class DraggableBubble extends Component {
               <img
                 onMouseEnter={this.hoverOn}
                 draggable="false"
-                src="https://picsum.photos/1000/1000?random=5"
+                src="https://via.placeholder.com/1000"
                 alt={this.props.title}
                 className="handle img-fluid rounded-circle bubbleImage"
               />
@@ -67,14 +60,14 @@ class DraggableBubble extends Component {
                 {this.props.title}
               </span>
               {this.state.hover && (
-                <div className="bubbleDashboard">
-                  <button className="btn btn-sm btn-info bubbleDashboardBtn m-1">
+                <div className="bubbleDashboard mt-1">
+                  <button className="btn btn-sm btn-info bubbleDashboardBtn mr-1 mb-1">
                     <i className="fas fa-info"></i>
                   </button>
-                  <button className="btn btn-sm btn-info bubbleDashboardBtn m-1">
+                  <button className="btn btn-sm btn-info bubbleDashboardBtn mr-1 mb-1">
                     <i className="fas fa-check"></i>
                   </button>
-                  <button className="btn btn-sm btn-info bubbleDashboardBtn m-1">
+                  <button className="btn btn-sm btn-info bubbleDashboardBtn mr-1 mb-1">
                     <i className="fas fa-times"></i>
                   </button>
                 </div>
@@ -94,6 +87,7 @@ DraggableBubble.propTypes = {
   importanceFactor: PropTypes.number.isRequired,
   deadline: PropTypes.bool.isRequired,
   handle: PropTypes.string.isRequired,
+  disabled: PropTypes.bool.isRequired,
   defaultPosition: PropTypes.object.isRequired,
   onStart: PropTypes.func,
   onDrag: PropTypes.func,

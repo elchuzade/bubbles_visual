@@ -7,7 +7,7 @@ module.exports = function validateImportance(data) {
   data.importance = !isEmpty(data.importance) ? data.importance : '';
 
   let options = {
-    min: 20,
+    min: 30,
     max: 80,
     allow_leading_zeroes: false
   };

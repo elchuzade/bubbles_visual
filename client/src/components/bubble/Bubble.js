@@ -27,7 +27,8 @@ class Bubble extends Component {
       importanceFactor: undefined,
       errors: {},
       bubble: {},
-      pageBubbles: []
+      pageBubbles: [],
+      moveBubbles: false
     };
   }
   handleResize = () => {
@@ -79,6 +80,12 @@ class Bubble extends Component {
   createBubble = () => {
     this.props.createBubble(this.state.bubble);
   };
+  enableMoveBubbles = () => {
+    this.setState({ moveBubbles: true });
+  };
+  disableMoveBubbles = () => {
+    this.setState({ moveBubbles: false });
+  };
   render() {
     // const { errors } = this.state;
     // const { isAuthenticated } = this.props.auth;
@@ -103,6 +110,21 @@ class Bubble extends Component {
               <span className="ml-5">
                 HOVERING STATUS {this.state.hoverOn && 'ON'}
               </span>
+              {this.state.moveBubbles ? (
+                <button
+                  className="btn btn-sm btn-success"
+                  onClick={this.disableMoveBubbles}
+                >
+                  save
+                </button>
+              ) : (
+                <button
+                  className="btn btn-sm btn-success"
+                  onClick={this.enableMoveBubbles}
+                >
+                  move
+                </button>
+              )}
             </div>
           </div>
         </div>
@@ -114,6 +136,7 @@ class Bubble extends Component {
               this.state.bubble.children.length > 0 &&
               this.state.bubble.children.map(child => (
                 <Line
+                  zIndex={-1}
                   key={child.id}
                   x0={
                     this.state.leftOffset +
@@ -149,6 +172,7 @@ class Bubble extends Component {
                   importanceFactor={this.state.importanceFactor}
                   deadline={bubble.deadline ? true : false}
                   handle=".handle"
+                  disabled={!this.state.moveBubbles}
                   defaultPosition={{
                     x:
                       PercentToPixel(bubble.position.x, this.state.plainWidth) -
