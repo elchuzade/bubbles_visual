@@ -28,7 +28,8 @@ class Bubble extends Component {
       errors: {},
       bubble: {},
       pageBubbles: [],
-      moveBubbles: false
+      moveBubbles: false,
+      movedBubbles: []
     };
   }
   handleResize = () => {
@@ -58,7 +59,15 @@ class Bubble extends Component {
     }
     // Set page bubbles
     if (nextProps.bubble && nextProps.bubble.bubbles) {
-      this.setState({ pageBubbles: nextProps.bubble.bubbles });
+      this.setState(
+        {
+          pageBubbles: nextProps.bubble.bubbles,
+          movedBubbles: nextProps.bubble.bubbles
+        },
+        () => {
+          console.log(this.state.movedBubbles);
+        }
+      );
     }
   }
   componentWillUnmount() {
@@ -75,7 +84,16 @@ class Bubble extends Component {
       x: PixelToPercent(bubbleCenterX, this.state.plainWidth),
       y: PixelToPercent(bubbleCenterY, this.state.plainHeight)
     };
-    this.props.updatePosition(id, draggedBubblePosition);
+    let { movedBubbles } = this.state;
+    for (let i = 0; i < movedBubbles.length; i++) {
+      if (movedBubbles[i]._id == id) {
+        movedBubbles[i].position.x = draggedBubblePosition.x;
+        movedBubbles[i].position.y = draggedBubblePosition.y;
+        movedBubbles[i].refresh = true;
+        this.setState({ movedBubbles: movedBubbles });
+        break;
+      }
+    }
   };
   createBubble = () => {
     this.props.createBubble(this.state.bubble);
@@ -83,9 +101,16 @@ class Bubble extends Component {
   enableMoveBubbles = () => {
     this.setState({ moveBubbles: true });
   };
-  disableMoveBubbles = () => {
+  saveMoveBubbles = () => {
     this.setState({ moveBubbles: false });
+    const { movedBubbles } = this.state;
+    for (let i = 0; i < movedBubbles.length; i++) {
+      if (movedBubbles[i].refresh) {
+        this.props.updatePosition(movedBubbles[i]._id, movedBubbles[i].position);
+      }
+    }
   };
+  resetBubbles = () => {};
   render() {
     // const { errors } = this.state;
     // const { isAuthenticated } = this.props.auth;
@@ -111,15 +136,23 @@ class Bubble extends Component {
                 HOVERING STATUS {this.state.hoverOn && 'ON'}
               </span>
               {this.state.moveBubbles ? (
-                <button
-                  className="btn btn-sm btn-success"
-                  onClick={this.disableMoveBubbles}
-                >
-                  save
-                </button>
+                <span>
+                  <button
+                    className="btn btn-sm btn-success mx-1"
+                    onClick={this.saveMoveBubbles}
+                  >
+                    save
+                  </button>
+                  <button
+                    className="btn btn-sm btn-success mx-1"
+                    onClick={this.resetBubbles}
+                  >
+                    reset
+                  </button>
+                </span>
               ) : (
                 <button
-                  className="btn btn-sm btn-success"
+                  className="btn btn-sm btn-success mx-1"
                   onClick={this.enableMoveBubbles}
                 >
                   move
