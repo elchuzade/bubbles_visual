@@ -15,6 +15,12 @@ import SelectInput from '../common/SelectInput';
 import FileInputGroup from '../common/FileInputGroup';
 import statusOptions from '../common/options/statusOptions';
 
+import ReactQuill from 'react-quill';
+import 'react-quill/dist/quill.snow.css';
+import 'react-quill/dist/quill.bubble.css';
+import modules from '../common/exports/QuillModules';
+import formats from '../common/exports/QuillFormats';
+
 import {
   getBubble,
   getPageBubbles,
@@ -47,6 +53,7 @@ class Bubble extends Component {
       title: '',
       status: '',
       importance: '',
+      info: '',
       avatarObject: {}
     };
   }
@@ -140,7 +147,8 @@ class Bubble extends Component {
       title: bubble.title,
       status: bubble.status,
       importance: bubble.importance,
-      parent: bubble.parent.title
+      parent: bubble.parent.title,
+      info: bubble.info
     });
   };
   getParentPage = id => {
@@ -226,9 +234,12 @@ class Bubble extends Component {
     }
   };
   changeStatus = (bubble, status) => {
-    if (bubble.status != status && bubble.status != "main") {
+    if (bubble.status != status && bubble.status != 'main') {
       this.props.updateStatus(bubble._id, { status: status });
     }
+  };
+  onChangeQuill = (content, delta, source, value) => {
+    this.setState({ info: value.getHTML() });
   };
   render() {
     const { errors } = this.state;
@@ -396,6 +407,13 @@ class Bubble extends Component {
                             this.state.selectedBubble
                           )}
                         />
+                        <ReactQuill
+                          value={this.state.info || ''}
+                          onChange={this.onChangeQuill}
+                          theme="snow"
+                          modules={modules}
+                          formats={formats}
+                        />
                       </div>
                     </div>
                   </div>
@@ -449,6 +467,11 @@ class Bubble extends Component {
                           </b>
                         </p>
                         <p>{this.state.selectedBubble.importance}</p>
+                        <div
+                          dangerouslySetInnerHTML={{
+                            __html: this.state.selectedBubble.info
+                          }}
+                        ></div>
                       </div>
                     </div>
                   </div>
