@@ -17,6 +17,7 @@ import statusOptions from '../common/options/statusOptions';
 import {
   getBubble,
   getPageBubbles,
+  getUserBubbles,
   updatePosition,
   createBubble
 } from '../../actions/bubbleActions';
@@ -33,6 +34,7 @@ class Bubble extends Component {
       errors: {},
       bubble: {},
       pageBubbles: [],
+      userBubbles: [],
       moveBubbles: false,
       movedBubbles: [],
       selectedBubble: {},
@@ -68,11 +70,17 @@ class Bubble extends Component {
     if (nextProps.bubble && nextProps.bubble.bubble) {
       this.setState({ bubble: nextProps.bubble.bubble });
     }
-    // Set page bubbles
-    if (nextProps.bubble && nextProps.bubble.bubbles) {
+    // Set user page bubbles
+    if (nextProps.bubble && nextProps.bubble.userBubbles) {
       this.setState({
-        pageBubbles: nextProps.bubble.bubbles,
-        movedBubbles: nextProps.bubble.bubbles
+        userBubbles: nextProps.bubble.userBubbles
+      });
+    }
+    // Set page bubbles
+    if (nextProps.bubble && nextProps.bubble.pageBubbles) {
+      this.setState({
+        pageBubbles: nextProps.bubble.pageBubbles,
+        movedBubbles: nextProps.bubble.pageBubbles
       });
     }
   }
@@ -152,6 +160,7 @@ class Bubble extends Component {
   };
   enableBubbleEdit = () => {
     this.setState({ bubbleEdit: true });
+    this.props.getUserBubbles();
   };
   saveBubbleEdit = () => {
     console.log('saving');
@@ -356,6 +365,7 @@ Bubble.propTypes = {
   bubble: PropTypes.object.isRequired,
   getBubble: PropTypes.func.isRequired,
   getPageBubbles: PropTypes.func.isRequired,
+  getUserBubbles: PropTypes.func.isRequired,
   updatePosition: PropTypes.func.isRequired,
   createBubble: PropTypes.func.isRequired
 };
@@ -368,5 +378,5 @@ const mapStateToProps = state => ({
 
 export default connect(
   mapStateToProps,
-  { getBubble, getPageBubbles, updatePosition, createBubble }
+  { getBubble, getPageBubbles, getUserBubbles, updatePosition, createBubble }
 )(Bubble);

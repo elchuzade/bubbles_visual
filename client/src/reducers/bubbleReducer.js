@@ -1,6 +1,7 @@
 import {
   GET_BUBBLE,
-  GET_BUBBLES,
+  GET_PAGE_BUBBLES,
+  GET_USER_BUBBLES,
   BUBBLE_LOADING,
   UPDATE_POSITION,
   CREATE_BUBBLE
@@ -8,7 +9,8 @@ import {
 
 const initialState = {
   bubble: null,
-  bubbles: null,
+  pageBubbles: null,
+  userBubbles: null,
   loading: false
 };
 
@@ -19,10 +21,16 @@ export default (state = initialState, action) => {
         ...state,
         loading: true
       };
-    case GET_BUBBLES:
+    case GET_PAGE_BUBBLES:
       return {
         ...state,
-        bubbles: action.payload,
+        pageBubbles: action.payload,
+        loading: false
+      };
+    case GET_USER_BUBBLES:
+      return {
+        ...state,
+        userBubbles: action.payload,
         loading: false
       };
     case GET_BUBBLE:
@@ -32,13 +40,13 @@ export default (state = initialState, action) => {
         loading: false
       };
     case UPDATE_POSITION: {
-      let updatedBubbles = state.bubbles;
+      let updatedBubbles = state.pageBubbles;
       for (let i = 0; i < updatedBubbles; i++) {
         if (updatedBubbles[i]._id === action.payload._id) {
           updatedBubbles[i].position = action.payload.position;
           return {
             ...state,
-            bubbles: updatedBubbles
+            pageBubbles: updatedBubbles
           };
         }
       }
@@ -51,7 +59,7 @@ export default (state = initialState, action) => {
       updatedBubbles.push(action.payload.item);
       return {
         ...state,
-        bubbles: updatedBubbles
+        pageBubbles: updatedBubbles
       };
     }
     default:

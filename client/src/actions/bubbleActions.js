@@ -10,7 +10,8 @@ import {
 
 import {
   GET_BUBBLE,
-  GET_BUBBLES,
+  GET_PAGE_BUBBLES,
+  GET_USER_BUBBLES,
   UPDATE_POSITION,
   CREATE_BUBBLE
 } from './types';
@@ -44,7 +45,23 @@ export const getPageBubbles = id => dispatch => {
     .get(`/api/bubbles/${id}/page`)
     .then(res => {
       dispatch({
-        type: GET_BUBBLES,
+        type: GET_PAGE_BUBBLES,
+        payload: res.data
+      });
+    })
+    .catch(err => {
+      dispatch(getError(err.response.data));
+    });
+};
+
+export const getUserBubbles = () => dispatch => {
+  dispatch(setLoading('bubble'));
+  refreshAll();
+  axios
+    .get('/api/bubbles/')
+    .then(res => {
+      dispatch({
+        type: GET_USER_BUBBLES,
         payload: res.data
       });
     })
