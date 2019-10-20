@@ -44,7 +44,11 @@ class DraggableBubble extends Component {
               <img
                 onMouseEnter={this.hoverOn}
                 draggable="false"
-                src="https://via.placeholder.com/1000"
+                src={
+                  this.props.bubble.avatar
+                    ? this.props.bubble.avatar.location
+                    : 'https://via.placeholder.com/1000'
+                }
                 alt={this.props.bubble.title}
                 className="handle img-fluid rounded-circle bubbleImage"
               />

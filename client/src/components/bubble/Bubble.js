@@ -19,7 +19,8 @@ import {
   getPageBubbles,
   getUserBubbles,
   updatePosition,
-  createBubble
+  createBubble,
+  uploadBubbleAvatar
 } from '../../actions/bubbleActions';
 
 class Bubble extends Component {
@@ -39,10 +40,12 @@ class Bubble extends Component {
       movedBubbles: [],
       selectedBubble: {},
       bubbleEdit: false,
+      avatar: '',
       parent: '',
       title: '',
       status: '',
-      importance: ''
+      importance: '',
+      avatarObject: {}
     };
   }
   handleResize = () => {
@@ -134,7 +137,7 @@ class Bubble extends Component {
       title: bubble.title,
       status: bubble.status,
       importance: bubble.importance,
-      parent: bubble.parent
+      parent: bubble.parent.title
     });
   };
   getParentPage = id => {
@@ -167,6 +170,54 @@ class Bubble extends Component {
   };
   onChange = e => {
     this.setState({ [e.target.name]: e.target.value });
+  };
+  buildParentOptions = (allBubbles, selectedBubble) => {
+    let parentOptions = [];
+    for (let i = 0; i < allBubbles.length; i++) {
+      if (allBubbles[i]._id != selectedBubble._id) {
+        parentOptions.push({
+          label: `${allBubbles[i].title}`,
+          value: `${allBubbles[i]._id}`
+        });
+      }
+    }
+    return parentOptions;
+  };
+  onChangeAvatar = e => {
+    e.preventDefault();
+    this.setState({ avatarObject: e.target.files[0] });
+  };
+  onSubmitAvatar = e => {
+    e.preventDefault();
+    if (this.state.avatarObject.name) {
+      const formData = new FormData();
+      formData.append('bubbleAvatar', this.state.avatarObject);
+      const configData = {
+        headers: {
+          'content-type': 'multipart/form/data'
+        }
+      };
+      this.props.uploadBubbleAvatar(
+        formData,
+        configData,
+        this.state.selectedBubble._id
+      );
+    } else {
+      let updatedErrors = this.state.errors;
+      updatedErrors.avatar = 'Choose image to upload';
+      this.setState({ errors: updatedErrors });
+    }
+  };
+  onClickDeleteAvatar = e => {
+    e.preventDefault();
+    if (this.state.avatarObject.name || this.state.avatar) {
+      this.props.deleteBubbleAvatar(this.state.selectedBubble._id);
+      this.setState({ avatarObject: {}, avatar: '' });
+    } else {
+      let updatedErrors = this.state.errors;
+      updatedErrors.avatar = 'No image to delete';
+      this.setState({ errors: updatedErrors });
+    }
   };
   render() {
     const { errors } = this.state;
@@ -263,10 +314,43 @@ class Bubble extends Component {
                     <div className="row">
                       <div className="col-3">
                         <img
-                          src="https://via.placeholder.com/1000"
+                          src={
+                            this.state.selectedBubble.avatar
+                              ? this.state.selectedBubble.avatar.location
+                              : 'https://via.placeholder.com/1000'
+                          }
                           alt="img"
                           className="img-fluid rounded-circle"
                         />
+                        <form onSubmit={this.onSubmitAvatar}>
+                          <small class="text-muted">
+                            This image will be shown in the list of events
+                          </small>
+                          <FileInputGroup
+                            name="bubbleAvatar"
+                            placeholder="Bubble Avatar"
+                            onChange={this.onChangeAvatar}
+                            sendFile={this.state.avatarObject}
+                            error={errors.avatar}
+                            accept="image/png, image/jpg, image/jpeg"
+                          />
+                          <div className="row mt-2 mb-5">
+                            <div className="col">
+                              <button
+                                className="btn btn-danger mx-2"
+                                onClick={this.onClickDeleteAvatar}
+                              >
+                                Delete
+                              </button>
+                              <button
+                                className="btn mx-2"
+                                type="submit"
+                              >
+                                Upload
+                              </button>
+                            </div>
+                          </div>
+                        </form>
                       </div>
                       <div className="col-9">
                         <button
@@ -297,6 +381,15 @@ class Bubble extends Component {
                           min={30}
                           max={80}
                         />
+                        <SelectInput
+                          name="parent"
+                          value={this.state.parent}
+                          onChange={this.onChange}
+                          options={this.buildParentOptions(
+                            this.state.userBubbles,
+                            this.state.selectedBubble
+                          )}
+                        />
                       </div>
                     </div>
                   </div>
@@ -307,7 +400,11 @@ class Bubble extends Component {
                     <div className="row">
                       <div className="col-3">
                         <img
-                          src="https://via.placeholder.com/1000"
+                          src={
+                            this.state.selectedBubble.avatar
+                              ? this.state.selectedBubble.avatar.location
+                              : 'https://via.placeholder.com/1000'
+                          }
                           alt="img"
                           className="img-fluid rounded-circle"
                         />
@@ -367,7 +464,8 @@ Bubble.propTypes = {
   getPageBubbles: PropTypes.func.isRequired,
   getUserBubbles: PropTypes.func.isRequired,
   updatePosition: PropTypes.func.isRequired,
-  createBubble: PropTypes.func.isRequired
+  createBubble: PropTypes.func.isRequired,
+  uploadBubbleAvatar: PropTypes.func.isRequired
 };
 
 const mapStateToProps = state => ({
@@ -378,5 +476,12 @@ const mapStateToProps = state => ({
 
 export default connect(
   mapStateToProps,
-  { getBubble, getPageBubbles, getUserBubbles, updatePosition, createBubble }
+  {
+    getBubble,
+    getPageBubbles,
+    getUserBubbles,
+    updatePosition,
+    createBubble,
+    uploadBubbleAvatar
+  }
 )(Bubble);
