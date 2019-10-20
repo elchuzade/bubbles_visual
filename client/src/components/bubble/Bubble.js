@@ -9,6 +9,10 @@ import { Line } from 'react-lineto';
 import ReactHtmlParser from 'react-html-parser';
 import DraggableBubble from './DraggableBubble';
 import BubbleDashboard from './BubbleDashboard';
+import TextInput from '../common/TextInput';
+import NumberInput from '../common/NumberInput';
+import SelectInput from '../common/SelectInput';
+import statusOptions from '../common/options/statusOptions';
 
 import {
   getBubble,
@@ -32,7 +36,11 @@ class Bubble extends Component {
       moveBubbles: false,
       movedBubbles: [],
       selectedBubble: {},
-      bubbleEdit: false
+      bubbleEdit: false,
+      parent: '',
+      title: '',
+      status: '',
+      importance: ''
     };
   }
   handleResize = () => {
@@ -111,11 +119,15 @@ class Bubble extends Component {
       }
     }
   };
-  resetBubbles = () => {
-    this.forceUpdate();
-  };
+  resetBubbles = () => {};
   selectBubbleInfo = bubble => {
-    this.setState({ selectedBubble: bubble });
+    this.setState({
+      selectedBubble: bubble,
+      title: bubble.title,
+      status: bubble.status,
+      importance: bubble.importance,
+      parent: bubble.parent
+    });
   };
   getParentPage = id => {
     const { pageBubbles } = this.state;
@@ -138,8 +150,17 @@ class Bubble extends Component {
     }
     return answer;
   };
+  enableBubbleEdit = () => {
+    this.setState({ bubbleEdit: true });
+  };
+  saveBubbleEdit = () => {
+    console.log('saving');
+  };
+  onChange = e => {
+    this.setState({ [e.target.name]: e.target.value });
+  };
   render() {
-    // const { errors } = this.state;
+    const { errors } = this.state;
     // const { isAuthenticated } = this.props.auth;
     const { bubble, loading } = this.props.bubble;
     let spinner = null;
@@ -229,7 +250,47 @@ class Bubble extends Component {
             <div className="container">
               {this.state.bubbleEdit ? (
                 <div className="row">
-                  <div className="col-12"></div>
+                  <div className="col-12">
+                    <div className="row">
+                      <div className="col-3">
+                        <img
+                          src="https://via.placeholder.com/1000"
+                          alt="img"
+                          className="img-fluid rounded-circle"
+                        />
+                      </div>
+                      <div className="col-9">
+                        <button
+                          className="btn btn-sm btn-success"
+                          onClick={this.saveBubbleEdit}
+                        >
+                          <i className="fas fa-save"></i>
+                        </button>
+                        <TextInput
+                          name="title"
+                          placeholder="Bubble title"
+                          value={this.state.title}
+                          onChange={this.onChange}
+                          error={errors.title}
+                        />
+                        <SelectInput
+                          name="status"
+                          value={this.state.status}
+                          onChange={this.onChange}
+                          options={statusOptions}
+                        />
+                        <NumberInput
+                          name="importance"
+                          placeholder="Bubble importance"
+                          value={this.state.importance}
+                          onChange={this.onChange}
+                          error={errors.importance}
+                          min={30}
+                          max={80}
+                        />
+                      </div>
+                    </div>
+                  </div>
                 </div>
               ) : (
                 <div className="row">
@@ -243,6 +304,12 @@ class Bubble extends Component {
                         />
                       </div>
                       <div className="col-9">
+                        <button
+                          className="btn btn-sm btn-warning"
+                          onClick={this.enableBubbleEdit}
+                        >
+                          <i className="fas fa-edit"></i>
+                        </button>
                         <h1>{this.state.selectedBubble.title}</h1>
                         <p>{this.state.selectedBubble.deadline}</p>
                         <p>
