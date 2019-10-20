@@ -131,7 +131,7 @@ export const deleteBubbleAvatar = id => dispatch => {
     });
 };
 
-export const changeStatus = (id, status) => dispatch => {
+export const updateStatus = (id, status) => dispatch => {
   refreshAll();
   axios
     .post(`/api/bubbles/${id}/status`, status)

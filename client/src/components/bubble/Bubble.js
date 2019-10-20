@@ -22,7 +22,8 @@ import {
   updatePosition,
   createBubble,
   uploadBubbleAvatar,
-  deleteBubbleAvatar
+  deleteBubbleAvatar,
+  updateStatus
 } from '../../actions/bubbleActions';
 
 class Bubble extends Component {
@@ -132,6 +133,7 @@ class Bubble extends Component {
     }
   };
   resetBubbles = () => {};
+
   selectBubbleInfo = bubble => {
     this.setState({
       selectedBubble: bubble,
@@ -223,6 +225,11 @@ class Bubble extends Component {
       }
     }
   };
+  changeStatus = (bubble, status) => {
+    if (bubble.status != status && bubble.status != "main") {
+      this.props.updateStatus(bubble._id, { status: status });
+    }
+  };
   render() {
     const { errors } = this.state;
     // const { isAuthenticated } = this.props.auth;
@@ -282,6 +289,7 @@ class Bubble extends Component {
                   <DraggableBubble
                     key={bubble._id}
                     selectBubbleInfo={this.selectBubbleInfo}
+                    changeStatus={this.changeStatus}
                     bubble={bubble}
                     importanceFactor={this.state.importanceFactor}
                     handle=".handle"
@@ -464,7 +472,8 @@ Bubble.propTypes = {
   updatePosition: PropTypes.func.isRequired,
   createBubble: PropTypes.func.isRequired,
   uploadBubbleAvatar: PropTypes.func.isRequired,
-  deleteBubbleAvatar: PropTypes.func.isRequired
+  deleteBubbleAvatar: PropTypes.func.isRequired,
+  updateStatus: PropTypes.func.isRequired
 };
 
 const mapStateToProps = state => ({
@@ -482,6 +491,7 @@ export default connect(
     updatePosition,
     createBubble,
     uploadBubbleAvatar,
-    deleteBubbleAvatar
+    deleteBubbleAvatar,
+    updateStatus
   }
 )(Bubble);

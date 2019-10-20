@@ -71,12 +71,29 @@ class DraggableBubble extends Component {
                   >
                     <i className="fas fa-info"></i>
                   </button>
-                  <button className="btn btn-sm btn-info bubbleDashboardBtn mr-1 mb-1">
-                    <i className="fas fa-check"></i>
-                  </button>
-                  <button className="btn btn-sm btn-info bubbleDashboardBtn mr-1 mb-1">
-                    <i className="fas fa-times"></i>
-                  </button>
+                  {this.props.bubble.status != 'main' && (
+                    <span>
+                      <button
+                        className={classnames(
+                          'btn btn-sm btn-info bubbleDashboardBtn mr-1 mb-1',
+                          {
+                            disabled: this.props.bubble.status === 'complete'
+                          }
+                        )}
+                        onClick={() =>
+                          this.props.changeStatus(
+                            this.props.bubble,
+                            'complete'
+                          )
+                        }
+                      >
+                        <i className="fas fa-check"></i>
+                      </button>
+                      <button className="btn btn-sm btn-info bubbleDashboardBtn mr-1 mb-1">
+                        <i className="fas fa-times"></i>
+                      </button>
+                    </span>
+                  )}
                 </div>
               )}
             </div>
@@ -97,7 +114,8 @@ DraggableBubble.propTypes = {
   onDrag: PropTypes.func,
   onStop: PropTypes.func,
   selectBubbleInfo: PropTypes.func.isRequired,
-  bounds: PropTypes.string
+  bounds: PropTypes.string,
+  changeStatus: PropTypes.func.isRequired
 };
 
 export default DraggableBubble;
