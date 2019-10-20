@@ -8,6 +8,7 @@ import {
 import { Line } from 'react-lineto';
 import ReactHtmlParser from 'react-html-parser';
 import DraggableBubble from './DraggableBubble';
+import BubbleDashboard from './BubbleDashboard';
 
 import {
   getBubble,
@@ -30,7 +31,8 @@ class Bubble extends Component {
       pageBubbles: [],
       moveBubbles: false,
       movedBubbles: [],
-      selectedBubble: {}
+      selectedBubble: {},
+      bubbleEdit: false
     };
   }
   handleResize = () => {
@@ -130,9 +132,10 @@ class Bubble extends Component {
     let answer = ``;
     for (let i = 0; i < path.length; i++) {
       answer += `<span>${path[i].title}</span>`;
-      answer += ` / `;
+      if (i < path.length - 1) {
+        answer += ` / `;
+      }
     }
-    console.log(typeof answer);
     return answer;
   };
   render() {
@@ -147,41 +150,13 @@ class Bubble extends Component {
     }
     return (
       <div>
-        <div className="container dashboard">
-          <div className="row">
-            <div className="col-12 my-2">
-              <button
-                className="btn btn-sm btn-success"
-                onClick={this.createBubble}
-              >
-                <i className="fas fa-plus"></i>
-              </button>
-              {this.state.moveBubbles ? (
-                <span>
-                  <button
-                    className="btn btn-sm btn-success mx-1"
-                    onClick={this.saveMoveBubbles}
-                  >
-                    save
-                  </button>
-                  <button
-                    className="btn btn-sm btn-success mx-1"
-                    onClick={this.resetBubbles}
-                  >
-                    reset
-                  </button>
-                </span>
-              ) : (
-                <button
-                  className="btn btn-sm btn-success mx-1"
-                  onClick={this.enableMoveBubbles}
-                >
-                  move
-                </button>
-              )}
-            </div>
-          </div>
-        </div>
+        <BubbleDashboard
+          createBubble={this.createBubble}
+          moveBubbles={this.state.moveBubbles}
+          enableMoveBubbles={this.enableMoveBubbles}
+          saveMoveBubbles={this.saveMoveBubbles}
+          resetBubbles={this.resetBubbles}
+        />
         {spinner}
         {!spinner && (
           <section id="bubbles">
@@ -252,48 +227,54 @@ class Bubble extends Component {
         {!spinner && Object.keys(this.state.selectedBubble).length > 0 && (
           <section id="bubbleInfo" style={{ marginTop: window.innerHeight }}>
             <div className="container">
-              <div className="row">
-                <div className="col-12">
-                  <div className="row">
-                    <div className="col-3">
-                      <img
-                        src="https://via.placeholder.com/1000"
-                        alt="img"
-                        className="img-fluid rounded-circle"
-                      />
-                    </div>
-                    <div className="col-9">
-                      <h1>{this.state.selectedBubble.title}</h1>
-                      <p>{this.state.selectedBubble.deadline}</p>
-                      <p>
-                        <i>parent: </i>
-                        <b>{this.state.selectedBubble.parent.title}</b>
-                      </p>
-                      <p>
-                        <i>status: </i>
-                        <b>{this.state.selectedBubble.status}</b>
-                      </p>
-                      <p>
-                        <i>path: </i>
-                        <b>
-                          {ReactHtmlParser(
-                            this.getPath(this.state.selectedBubble)
-                          )}
-                        </b>
-                      </p>
-                      <p>
-                        <i>page: </i>
-                        <b>
-                          {this.getParentPage(
-                            this.state.selectedBubble.parentPage
-                          )}
-                        </b>
-                      </p>
-                      <p>importance</p>
+              {this.state.bubbleEdit ? (
+                <div className="row">
+                  <div className="col-12"></div>
+                </div>
+              ) : (
+                <div className="row">
+                  <div className="col-12">
+                    <div className="row">
+                      <div className="col-3">
+                        <img
+                          src="https://via.placeholder.com/1000"
+                          alt="img"
+                          className="img-fluid rounded-circle"
+                        />
+                      </div>
+                      <div className="col-9">
+                        <h1>{this.state.selectedBubble.title}</h1>
+                        <p>{this.state.selectedBubble.deadline}</p>
+                        <p>
+                          <i>parent: </i>
+                          <b>{this.state.selectedBubble.parent.title}</b>
+                        </p>
+                        <p>
+                          <i>status: </i>
+                          <b>{this.state.selectedBubble.status}</b>
+                        </p>
+                        <p>
+                          <i>path: </i>
+                          <b>
+                            {ReactHtmlParser(
+                              this.getPath(this.state.selectedBubble)
+                            )}
+                          </b>
+                        </p>
+                        <p>
+                          <i>page: </i>
+                          <b>
+                            {this.getParentPage(
+                              this.state.selectedBubble.parentPage
+                            )}
+                          </b>
+                        </p>
+                        <p>{this.state.selectedBubble.importance}</p>
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
+              )}
             </div>
           </section>
         )}
