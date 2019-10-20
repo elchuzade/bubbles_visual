@@ -13,7 +13,8 @@ import {
   GET_PAGE_BUBBLES,
   GET_USER_BUBBLES,
   UPDATE_POSITION,
-  CREATE_BUBBLE
+  CREATE_BUBBLE,
+  UPDATE_STATUS
 } from './types';
 
 const refreshAll = () => dispatch => {
@@ -118,10 +119,25 @@ export const uploadBubbleAvatar = (imageData, config, id) => dispatch => {
 export const deleteBubbleAvatar = id => dispatch => {
   refreshAll();
   axios
-    .delete(`/api/blogs/${id}/avatar`)
+    .delete(`/api/bubbles/${id}/avatar`)
     .then(res => {
       dispatch({
         type: GET_BUBBLE,
+        payload: res.data
+      });
+    })
+    .catch(err => {
+      dispatch(getError(err.response.data));
+    });
+};
+
+export const changeStatus = (id, status) => dispatch => {
+  refreshAll();
+  axios
+    .post(`/api/bubbles/${id}/status`, status)
+    .then(res => {
+      dispatch({
+        type: UPDATE_STATUS,
         payload: res.data
       });
     })

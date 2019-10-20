@@ -42,7 +42,6 @@ class Bubble extends Component {
       movedBubbles: [],
       selectedBubble: {},
       bubbleEdit: false,
-      avatar: '',
       parent: '',
       title: '',
       status: '',
@@ -212,13 +211,16 @@ class Bubble extends Component {
   };
   onClickDeleteAvatar = e => {
     e.preventDefault();
-    if (this.state.avatarObject.name || this.state.avatar) {
-      this.props.deleteBubbleAvatar(this.state.selectedBubble._id);
-      this.setState({ avatarObject: {}, avatar: '' });
+    if (this.state.avatarObject.location) {
+      this.setState({ avatarObject: {} });
     } else {
-      let updatedErrors = this.state.errors;
-      updatedErrors.avatar = 'No image to delete';
-      this.setState({ errors: updatedErrors });
+      if (this.state.selectedBubble.avatar.location) {
+        this.props.deleteBubbleAvatar(this.state.selectedBubble._id);
+      } else {
+        let updatedErrors = this.state.errors;
+        updatedErrors.avatar = 'No image to delete';
+        this.setState({ errors: updatedErrors });
+      }
     }
   };
   render() {
@@ -325,9 +327,6 @@ class Bubble extends Component {
                           className="img-fluid rounded-circle"
                         />
                         <form onSubmit={this.onSubmitAvatar}>
-                          <small class="text-muted">
-                            This image will be shown in the list of events
-                          </small>
                           <FileInputGroup
                             name="bubbleAvatar"
                             placeholder="Bubble Avatar"

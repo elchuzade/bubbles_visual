@@ -4,6 +4,7 @@ import {
   GET_USER_BUBBLES,
   BUBBLE_LOADING,
   UPDATE_POSITION,
+  UPDATE_STATUS,
   CREATE_BUBBLE
 } from '../actions/types';
 
@@ -44,6 +45,21 @@ export default (state = initialState, action) => {
       for (let i = 0; i < updatedBubbles; i++) {
         if (updatedBubbles[i]._id === action.payload._id) {
           updatedBubbles[i].position = action.payload.position;
+          return {
+            ...state,
+            pageBubbles: updatedBubbles
+          };
+        }
+      }
+      return {
+        ...state
+      };
+    }
+    case UPDATE_STATUS: {
+      let updatedBubbles = state.pageBubbles;
+      for (let i = 0; i < updatedBubbles; i++) {
+        if (updatedBubbles[i]._id === action.payload._id) {
+          updatedBubbles[i].status = action.payload.status;
           return {
             ...state,
             pageBubbles: updatedBubbles
