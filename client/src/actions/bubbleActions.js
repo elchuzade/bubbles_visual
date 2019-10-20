@@ -99,3 +99,33 @@ export const createBubble = bubble => dispatch => {
       dispatch(getError(err.response.data));
     });
 };
+
+export const uploadBubbleAvatar = (imageData, config, id) => dispatch => {
+  refreshAll();
+  axios
+    .post(`/api/bubbles/${id}/avatar`, imageData, config)
+    .then(res => {
+      dispatch({
+        type: GET_BUBBLE,
+        payload: res.data
+      });
+    })
+    .catch(err => {
+      dispatch(getError(err.response.data));
+    });
+};
+
+export const deleteBubbleAvatar = id => dispatch => {
+  refreshAll();
+  axios
+    .delete(`/api/blogs/${id}/avatar`)
+    .then(res => {
+      dispatch({
+        type: GET_BUBBLE,
+        payload: res.data
+      });
+    })
+    .catch(err => {
+      dispatch(getError(err.response.data));
+    });
+};

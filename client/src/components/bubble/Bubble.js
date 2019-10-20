@@ -12,6 +12,7 @@ import BubbleDashboard from './BubbleDashboard';
 import TextInput from '../common/TextInput';
 import NumberInput from '../common/NumberInput';
 import SelectInput from '../common/SelectInput';
+import FileInputGroup from '../common/FileInputGroup';
 import statusOptions from '../common/options/statusOptions';
 
 import {
@@ -20,7 +21,8 @@ import {
   getUserBubbles,
   updatePosition,
   createBubble,
-  uploadBubbleAvatar
+  uploadBubbleAvatar,
+  deleteBubbleAvatar
 } from '../../actions/bubbleActions';
 
 class Bubble extends Component {
@@ -342,10 +344,7 @@ class Bubble extends Component {
                               >
                                 Delete
                               </button>
-                              <button
-                                className="btn mx-2"
-                                type="submit"
-                              >
+                              <button className="btn mx-2" type="submit">
                                 Upload
                               </button>
                             </div>
@@ -465,7 +464,8 @@ Bubble.propTypes = {
   getUserBubbles: PropTypes.func.isRequired,
   updatePosition: PropTypes.func.isRequired,
   createBubble: PropTypes.func.isRequired,
-  uploadBubbleAvatar: PropTypes.func.isRequired
+  uploadBubbleAvatar: PropTypes.func.isRequired,
+  deleteBubbleAvatar: PropTypes.func.isRequired
 };
 
 const mapStateToProps = state => ({
@@ -482,6 +482,7 @@ export default connect(
     getUserBubbles,
     updatePosition,
     createBubble,
-    uploadBubbleAvatar
+    uploadBubbleAvatar,
+    deleteBubbleAvatar
   }
 )(Bubble);
